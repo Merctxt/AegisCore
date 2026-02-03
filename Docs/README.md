@@ -1,9 +1,8 @@
-# 🚀 ModBot API - Documentação
+# 🛡️ AegisCore - Documentação Técnica
 
-Uma API REST para moderação automática de conteúdo usando Google Perspective API. Permite que qualquer aplicação integre funcionalidades de moderação de IA.
+API REST para moderação automática de conteúdo usando Google Perspective API. Este documento é destinado a desenvolvedores que desejam hospedar sua própria instância.
 
 ## 📋 Índice
-
 
 1. [Instalação e Configuração](./instalacao-configuracao/README.md)
 2. [Autenticação](./autenticacao/README.md)
@@ -13,91 +12,213 @@ Uma API REST para moderação automática de conteúdo usando Google Perspective
 6. [Códigos de Status](./codigos-de-status/README.md)
 7. [Integração com Aplicações](./integracao-com-aplicacoes/README.md)
 
+## 🏗️ Arquitetura
+
+```
+AegisCore/
+├── AegisCoreApi/          # Backend API (ASP.NET Core)
+│   ├── Controllers/       # Endpoints da API
+│   ├── Services/          # Lógica de negócio
+│   ├── Models/            # Entidades do banco
+│   ├── DTOs/              # Data Transfer Objects
+│   ├── Data/              # DbContext (PostgreSQL)
+│   └── Middleware/        # Autenticação API Key
+├── AegisCoreWeb/          # Frontend (ASP.NET MVC)
+│   ├── Controllers/       # Controllers MVC
+│   ├── Views/             # Razor Views
+│   ├── Models/            # ViewModels
+│   └── Services/          # Serviços HTTP
+└── Docs/                  # Documentação
+```
+
 ## 🛠️ Instalação e Configuração
 
-### 1. Dependências
+### Pré-requisitos
+- .NET 10 SDK
+- PostgreSQL 14+
+- Google Perspective API Key
+
+### 1. Clone o repositório
 ```bash
-npm install express cors helmet rate-limiter-flexible uuid
+git clone https://github.com/Merctxt/AegisCore.git
+cd AegisCore
 ```
 
-### 2. Configuração do .env
+### 2. Configure as variáveis de ambiente
+```bash
+cp .env.example .env
+```
+
+Edite o arquivo `.env`:
 ```env
-# Configurações da API
-API_PORT=3000
-API_SECRET_KEY=seu-token-super-secreto-aqui
+# Database (PostgreSQL)
+DATABASE_URL=postgresql://user:password@localhost:5432/aegiscore
 
-# Perspective API (obrigatório)
-PERSPECTIVE_API_KEY=sua_chave_da_perspective_api
+# JWT Authentication
+JWT_SECRET=sua-chave-secreta-com-pelo-menos-32-caracteres!
 
-# Configurações de moderação
-TOXICITY_THRESHOLD=0.7
-SEVERE_TOXICITY_THRESHOLD=0.8
+# Google Perspective API
+PERSPECTIVE_API_KEY=sua_chave_aqui
 ```
 
-### 3. Iniciar a API
+### 3. Execute as migrations
 ```bash
-npm run api
-# ou para desenvolvimento
-npm run dev-api
+cd AegisCoreApi
+dotnet ef migrations add InitialCreate
+dotnet ef database update
+```
+
+### 4. Inicie a API
+```bash
+dotnet run --project AegisCoreApi
+```
+
+A API estará disponível em `https://localhost:5050`
+
+### 5. Inicie o Frontend (opcional)
+```bash
+dotnet run --project AegisCoreWeb
 ```
 
 ## 🔐 Autenticação
 
-### API Key
-Alguns endpoints requerem autenticação via API key:
+### JWT Token (para Dashboard)
+```http
+POST /api/auth/login
+Content-Type: application/json
 
-**Header:**
-```
-X-API-Key: seu-token-super-secreto-aqui
-```
-
-**Query Parameter:**
-```
-?apiKey=seu-token-super-secreto-aqui
+{
+  "email": "usuario@email.com",
+  "password": "suasenha"
+}
 ```
 
-### Endpoints Protegidos
-- `POST /batch` - Análise em lote
-- `GET /stats` - Estatísticas do sistema
+**Resposta:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "expiresAt": "2025-01-22T12:00:00Z",
+  "user": {
+    "id": "guid",
+    "name": "Nome",
+    "email": "email@email.com",
+    "plan": "Free"
+  }
+}
+```
+
+### API Key (para Moderation Endpoints)
+```http
+POST /api/moderation/analyze
+X-Api-Key: aegis_sua_chave_aqui
+Content-Type: application/json
+
+{
+  "text": "Texto para analisar"
+}
+```
 
 ## ⚡ Rate Limiting
 
-- **Limite:** 100 requests por minuto
-- **Baseado em:** IP + API Key
-- **Resposta quando excedido:** HTTP 429
+| Plano      | Requisições/dia |
+|------------|-----------------|
+| Free       | 100             |
+| Starter    | 1,000           |
+| Pro        | 10,000          |
+| Enterprise | Ilimitado       |
 
-## 📡 Endpoints
+## 📡 Endpoints Principais
 
-### 1. Health Check
+### Health Check
 ```http
 GET /health
 ```
 
-**Resposta:**
-```json
+### Análise de Texto
+```http
+POST /api/moderation/analyze
+X-Api-Key: sua_chave
+
 {
-  "success": true,
-  "message": "ModBot API is running",
-  "timestamp": "2025-08-27T10:30:00.000Z",
-  "version": "1.0.0"
+  "text": "Texto para analisar",
+  "language": "pt",
+  "includeAllScores": false
 }
 ```
 
-### 2. Informações da API
-```http
-GET /info
-```
-
 **Resposta:**
 ```json
 {
-  "success": true,
+  "isToxic": false,
+  "toxicityScore": 0.12,
+  "allScores": null,
+  "analyzedText": "Texto para analisar",
+  "timestamp": "2025-01-15T10:30:00Z"
+}
+```
+
+### Análise em Lote
+```http
+POST /api/moderation/analyze/batch
+X-Api-Key: sua_chave
+
+{
+  "texts": ["texto1", "texto2", "texto3"],
+  "language": "pt"
+}
+```
+
+## 🔗 Webhooks
+
+Configure webhooks para receber notificações quando conteúdo tóxico for detectado:
+
+```http
+POST /api/webhooks
+Authorization: Bearer seu_jwt_token
+
+{
+  "name": "Alertas Toxicidade",
+  "url": "https://seu-servidor.com/webhook",
+  "secret": "chave_para_validacao",
+  "events": 1
+}
+```
+
+### Eventos Disponíveis
+- `1` - Conteúdo Tóxico
+- `2` - Alta Toxicidade (>90%)
+- `4` - Rate Limit Atingido
+- `7` - Todos os Eventos
+
+### Payload do Webhook
+```json
+{
+  "event": "ToxicContent",
+  "timestamp": "2025-01-15T10:30:00Z",
   "data": {
-    "name": "ModBot API",
-    "version": "1.0.0",
-    "description": "API de moderação automática",
-    "endpoints": [...],
-    "rateLimit": "100 requests per minute per IP/API key"
+    "text": "texto analisado",
+    "toxicityScore": 0.85,
+    "analyzedAt": "2025-01-15T10:30:00Z"
+  }
+}
+```
+
+### Validação de Assinatura
+Se você configurou um `secret`, valide a assinatura:
+```
+X-Aegis-Signature: sha256=hash_hmac_do_payload
+```
+
+## 🐳 Docker (Em breve)
+
+```dockerfile
+# Dockerfile disponível em breve
+docker-compose up -d
+```
+
+## 📄 Licença
+
+MIT License - Veja [LICENSE](../LICENSE) para mais detalhes.
   }
 }
 ```

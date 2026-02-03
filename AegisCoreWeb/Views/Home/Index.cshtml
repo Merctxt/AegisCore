@@ -1,8 +1,182 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Moderação de Conteúdo com IA";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- Hero Section -->
+<section class="bg-dark text-white py-5">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">
+                    Moderação de Conteúdo <span class="text-primary">Inteligente</span>
+                </h1>
+                <p class="lead mb-4">
+                    Proteja sua comunidade com IA. Detecte conteúdo tóxico, ofensivo e inadequado 
+                    em tempo real usando Google Perspective API.
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-lg">
+                        <i class="bi bi-rocket-takeoff me-2"></i>Começar Grátis
+                    </a>
+                    <a href="/swagger" class="btn btn-outline-light btn-lg" target="_blank">
+                        <i class="bi bi-code-slash me-2"></i>Ver API
+                    </a>
+                </div>
+                <p class="text-muted mt-3">
+                    <i class="bi bi-check-circle text-success me-1"></i>100 requisições/dia grátis
+                    <i class="bi bi-check-circle text-success ms-3 me-1"></i>Sem cartão de crédito
+                </p>
+            </div>
+            <div class="col-lg-6 text-center mt-5 mt-lg-0">
+                <div class="bg-secondary rounded-4 p-4">
+                    <pre class="text-start mb-0"><code class="text-light">
+<span class="text-info">POST</span> /api/moderation/analyze
+
+{
+  "text": "Seu texto aqui",
+  "language": "pt"
+}
+
+<span class="text-success">Response:</span>
+{
+  "isToxic": <span class="text-warning">false</span>,
+  "toxicityScore": <span class="text-primary">0.12</span>,
+  "timestamp": "2025-01-15T..."
+}
+                    </code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Por que escolher AegisCore?</h2>
+            <p class="text-muted">Tudo que você precisa para moderar conteúdo</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-3 mb-3">
+                            <i class="bi bi-lightning-charge text-primary fs-2"></i>
+                        </div>
+                        <h5 class="card-title">Rápido & Confiável</h5>
+                        <p class="card-text text-muted">
+                            Respostas em milissegundos com 99.9% de uptime. Infraestrutura escalável.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex p-3 mb-3">
+                            <i class="bi bi-shield-check text-success fs-2"></i>
+                        </div>
+                        <h5 class="card-title">IA Avançada</h5>
+                        <p class="card-text text-muted">
+                            Powered by Google Perspective API. Detecta toxicidade, ameaças, insultos e mais.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex p-3 mb-3">
+                            <i class="bi bi-gear text-info fs-2"></i>
+                        </div>
+                        <h5 class="card-title">Fácil Integração</h5>
+                        <p class="card-text text-muted">
+                            REST API simples. SDKs, webhooks e documentação completa.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How it Works -->
+<section class="bg-light py-5">
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Como Funciona</h2>
+            <p class="text-muted">3 passos simples para começar</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <span class="fs-4 fw-bold">1</span>
+                </div>
+                <h5>Crie sua conta</h5>
+                <p class="text-muted">Registre-se gratuitamente e obtenha sua API Key em segundos.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <span class="fs-4 fw-bold">2</span>
+                </div>
+                <h5>Integre sua aplicação</h5>
+                <p class="text-muted">Use nossa API REST para enviar textos para análise.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <span class="fs-4 fw-bold">3</span>
+                </div>
+                <h5>Receba os resultados</h5>
+                <p class="text-muted">Obtenha scores de toxicidade e tome decisões automatizadas.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Use Cases -->
+<section class="py-5">
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Casos de Uso</h2>
+            <p class="text-muted">Onde você pode usar AegisCore</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-3 col-6">
+                <div class="text-center p-3">
+                    <i class="bi bi-discord fs-1 text-primary mb-2 d-block"></i>
+                    <h6>Bots Discord</h6>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="text-center p-3">
+                    <i class="bi bi-chat-dots fs-1 text-primary mb-2 d-block"></i>
+                    <h6>Chats ao Vivo</h6>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="text-center p-3">
+                    <i class="bi bi-people fs-1 text-primary mb-2 d-block"></i>
+                    <h6>Fóruns</h6>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="text-center p-3">
+                    <i class="bi bi-controller fs-1 text-primary mb-2 d-block"></i>
+                    <h6>Jogos Online</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="bg-primary text-white py-5">
+    <div class="container text-center py-5">
+        <h2 class="fw-bold mb-3">Pronto para começar?</h2>
+        <p class="lead mb-4">Crie sua conta gratuita e comece a moderar conteúdo agora.</p>
+        <a asp-controller="Account" asp-action="Register" class="btn btn-light btn-lg">
+            <i class="bi bi-rocket-takeoff me-2"></i>Criar Conta Grátis
+        </a>
+    </div>
+</section>

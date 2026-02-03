@@ -1,0 +1,326 @@
+@model AegisCoreWeb.Models.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-0">Dashboard</h2>
+            <p class="text-muted mb-0">Bem-vindo, @Model.User.Name!</p>
+        </div>
+        <div>
+            <span class="badge bg-@(Model.User.Plan == "Free" ? "secondary" : Model.User.Plan == "Pro" ? "primary" : "success") fs-6">
+                <i class="bi bi-star-fill me-1"></i>Plano @Model.User.Plan
+            </span>
+        </div>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1 small">Requisições Hoje</p>
+                            <h3 class="fw-bold mb-0">@Model.Stats.RequestsToday</h3>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 rounded p-2">
+                            <i class="bi bi-graph-up text-primary fs-4"></i>
+                        </div>
+                    </div>
+                    <div class="progress mt-3" style="height: 5px;">
+                        <div class="progress-bar" style="width: @Model.Stats.UsagePercentage%"></div>
+                    </div>
+                    <small class="text-muted">@Model.Stats.RequestsToday / @Model.Stats.DailyLimit</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1 small">Este Mês</p>
+                            <h3 class="fw-bold mb-0">@Model.Stats.RequestsThisMonth</h3>
+                        </div>
+                        <div class="bg-success bg-opacity-10 rounded p-2">
+                            <i class="bi bi-calendar-check text-success fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1 small">API Keys Ativas</p>
+                            <h3 class="fw-bold mb-0">@Model.ApiKeys.Count(k => k.IsActive)</h3>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 rounded p-2">
+                            <i class="bi bi-key text-warning fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1 small">Webhooks</p>
+                            <h3 class="fw-bold mb-0">@Model.Webhooks.Count</h3>
+                        </div>
+                        <div class="bg-info bg-opacity-10 rounded p-2">
+                            <i class="bi bi-broadcast text-info fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- New API Key Alert -->
+    @if (TempData["NewApiKey"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <h5 class="alert-heading"><i class="bi bi-exclamation-triangle me-2"></i>Guarde sua API Key!</h5>
+            <p class="mb-2">Esta chave não será mostrada novamente:</p>
+            <div class="input-group">
+                <input type="text" class="form-control font-monospace" value="@TempData["NewApiKey"]" id="newApiKey" readonly />
+                <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('newApiKey')">
+                    <i class="bi bi-clipboard"></i> Copiar
+                </button>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    
+    <div class="row g-4">
+        <!-- API Keys Section -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-key me-2"></i>Suas API Keys</h5>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createKeyModal">
+                        <i class="bi bi-plus-lg me-1"></i>Nova Chave
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.ApiKeys.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Chave</th>
+                                        <th>Status</th>
+                                        <th>Uso Hoje</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var key in Model.ApiKeys)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@key.Name</strong>
+                                                <br><small class="text-muted">Criada em @key.CreatedAt.ToString("dd/MM/yyyy")</small>
+                                            </td>
+                                            <td><code>@key.Key</code></td>
+                                            <td>
+                                                @if (key.IsActive)
+                                                {
+                                                    <span class="badge bg-success">Ativa</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger">Revogada</span>
+                                                }
+                                            </td>
+                                            <td>@key.RequestsToday</td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    @if (key.IsActive)
+                                                    {
+                                                        <form asp-action="RevokeApiKey" asp-route-id="@key.Id" method="post" class="d-inline">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-outline-warning" title="Revogar">
+                                                                <i class="bi bi-pause"></i>
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                    <form asp-action="DeleteApiKey" asp-route-id="@key.Id" method="post" class="d-inline" onsubmit="return confirm('Excluir esta chave permanentemente?')">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="submit" class="btn btn-outline-danger" title="Excluir">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="bi bi-key text-muted fs-1"></i>
+                            <p class="text-muted mt-2">Nenhuma API Key criada</p>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createKeyModal">
+                                Criar Primeira Chave
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Start -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0"><i class="bi bi-code-slash me-2"></i>Início Rápido</h5>
+                </div>
+                <div class="card-body">
+                    <p class="small text-muted">Use sua API Key para analisar textos:</p>
+                    <pre class="bg-dark text-light p-3 rounded small"><code>curl -X POST \
+  @ViewContext.HttpContext.Request.Scheme://@ViewContext.HttpContext.Request.Host/api/moderation/analyze \
+  -H "X-Api-Key: SUA_CHAVE" \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Seu texto"}'</code></pre>
+                    <a href="/swagger" target="_blank" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-book me-1"></i>Ver Documentação
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Webhooks -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-broadcast me-2"></i>Webhooks</h5>
+                    <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createWebhookModal">
+                        <i class="bi bi-plus-lg"></i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    @if (Model.Webhooks.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var webhook in Model.Webhooks.Take(3))
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <div>
+                                        <strong>@webhook.Name</strong>
+                                        <br><small class="text-muted text-truncate d-block" style="max-width: 200px;">@webhook.Url</small>
+                                    </div>
+                                    <form asp-action="DeleteWebhook" asp-route-id="@webhook.Id" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center small mb-0">Nenhum webhook configurado</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create API Key Modal -->
+<div class="modal fade" id="createKeyModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="CreateApiKey" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-key me-2"></i>Nova API Key</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nome da Chave</label>
+                        <input type="text" name="Name" class="form-control" placeholder="Ex: Produção, Desenvolvimento" required />
+                        <small class="text-muted">Um nome para identificar onde você usa esta chave</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Data de Expiração (opcional)</label>
+                        <input type="date" name="ExpiresAt" class="form-control" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Criar Chave</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Create Webhook Modal -->
+<div class="modal fade" id="createWebhookModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="CreateWebhook" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-broadcast me-2"></i>Novo Webhook</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nome</label>
+                        <input type="text" name="Name" class="form-control" placeholder="Ex: Alertas de Toxicidade" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">URL</label>
+                        <input type="url" name="Url" class="form-control" placeholder="https://seu-servidor.com/webhook" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Secret (opcional)</label>
+                        <input type="text" name="Secret" class="form-control" placeholder="Chave para validar assinatura" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Eventos</label>
+                        <select name="Events" class="form-select">
+                            <option value="1">Conteúdo Tóxico</option>
+                            <option value="2">Alta Toxicidade</option>
+                            <option value="4">Rate Limit Atingido</option>
+                            <option value="7">Todos os Eventos</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Criar Webhook</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function copyToClipboard(elementId) {
+            var copyText = document.getElementById(elementId);
+            copyText.select();
+            document.execCommand("copy");
+            alert("API Key copiada!");
+        }
+    </script>
+}

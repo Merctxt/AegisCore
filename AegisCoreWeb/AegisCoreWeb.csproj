@@ -6,4 +6,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- HTTP Client for API calls -->
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.6" />
+    
+    <!-- Session/Cookie Authentication -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.3.0" />
+    
+    <!-- Environment Variables -->
+    <PackageReference Include="DotNetEnv" Version="3.1.1" />
+  </ItemGroup>
+
 </Project>

@@ -7,7 +7,27 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
+    <!-- OpenAPI / Swagger -->
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
+    
+    <!-- Entity Framework Core + PostgreSQL -->
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.6" />
+    
+    <!-- Authentication JWT -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.6" />
+    
+    <!-- Rate Limiting -->
+    <PackageReference Include="AspNetCoreRateLimit" Version="5.0.0" />
+    
+    <!-- HTTP Client para Perspective API -->
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.6" />
+    
+    <!-- Environment Variables -->
+    <PackageReference Include="DotNetEnv" Version="3.1.1" />
+    
+    <!-- Password Hashing -->
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
   </ItemGroup>
 
 </Project>
