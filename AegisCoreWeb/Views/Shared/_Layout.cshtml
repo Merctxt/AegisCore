@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var apiUrl = Environment.GetEnvironmentVariable("API_URL") ?? "http://localhost:5050";
+}
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="utf-8" />
@@ -33,7 +36,7 @@
                             <a class="nav-link" asp-controller="Home" asp-action="Documentation">Documentação</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/swagger" target="_blank">API <i class="bi bi-box-arrow-up-right small"></i></a>
+                            <a class="nav-link" href="@apiUrl/swagger" target="_blank">API <i class="bi bi-box-arrow-up-right small"></i></a>
                         </li>
                     </ul>
                     <ul class="navbar-nav">
@@ -104,7 +107,7 @@
             <div class="row">
                 <div class="col-md-4 mb-4">
                     <h5><i class="bi bi-shield-check me-2"></i>AegisCore</h5>
-                    <p class="text-muted">Moderação de conteúdo com IA para suas aplicações.</p>
+                    <p class="">Moderação de conteúdo com IA para suas aplicações.</p>
                     <div class="d-flex gap-3">
                         <a href="https://github.com/Merctxt/AegisCore" class="text-light" target="_blank">
                             <i class="bi bi-github fs-4"></i>
@@ -114,45 +117,46 @@
                 <div class="col-md-2 mb-4">
                     <h6>Produto</h6>
                     <ul class="list-unstyled">
-                        <li><a href="#" class="text-muted text-decoration-none">Recursos</a></li>
-                        <li><a asp-controller="Home" asp-action="Pricing" class="text-muted text-decoration-none">Preços</a></li>
-                        <li><a href="/swagger" class="text-muted text-decoration-none">API</a></li>
+                        <li><a href="#" class="text-decoration-none">Recursos</a></li>
+                        <li><a asp-controller="Home" asp-action="Pricing" class="text-decoration-none">Preços</a></li>
+                        <li><a href="/swagger" class="text-decoration-none">API</a></li>
                     </ul>
                 </div>
                 <div class="col-md-2 mb-4">
                     <h6>Recursos</h6>
                     <ul class="list-unstyled">
-                        <li><a asp-controller="Home" asp-action="Documentation" class="text-muted text-decoration-none">Documentação</a></li>
-                        <li><a href="https://github.com/Merctxt/AegisCore" class="text-muted text-decoration-none">GitHub</a></li>
+                        <li><a asp-controller="Home" asp-action="Documentation" class="text-decoration-none">Documentação</a></li>
+                        <li><a href="https://github.com/Merctxt/AegisCore" class="text-decoration-none">GitHub</a></li>
                     </ul>
                 </div>
                 <div class="col-md-2 mb-4">
                     <h6>Legal</h6>
                     <ul class="list-unstyled">
-                        <li><a asp-controller="Home" asp-action="Privacy" class="text-muted text-decoration-none">Privacidade</a></li>
-                        <li><a asp-controller="Home" asp-action="Terms" class="text-muted text-decoration-none">Termos</a></li>
+                        <li><a asp-controller="Home" asp-action="Privacy" class="text-decoration-none">Privacidade</a></li>
+                        <li><a asp-controller="Home" asp-action="Terms" class="text-decoration-none">Termos</a></li>
                     </ul>
                 </div>
             </div>
             <hr class="border-secondary">
-            <div class="text-center text-muted">
+            <div class="text-center">
                 <small>&copy; @DateTime.Now.Year AegisCore. Todos os direitos reservados.</small>
             </div>
         </div>
     </footer>
     
-    <!-- Tawk.to Live Chat -->
-    <script type="text/javascript">
+    <!--Start of Tawk.to Script-->
+        <script type="text/javascript">
         var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
         (function(){
-            var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-            s1.async=true;
-            s1.src='https://embed.tawk.to/YOUR_TAWK_ID/default';
-            s1.charset='UTF-8';
-            s1.setAttribute('crossorigin','*');
-            s0.parentNode.insertBefore(s1,s0);
+        var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+        s1.async=true;
+        s1.src='https://embed.tawk.to/698292096273081c3ac0daba/1jgj0kt9v';
+        s1.charset='UTF-8';
+        s1.setAttribute('crossorigin','*');
+        s0.parentNode.insertBefore(s1,s0);
         })();
-    </script>
+        </script>
+    <!--End of Tawk.to Script-->
     
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

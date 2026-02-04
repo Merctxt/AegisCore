@@ -1,4 +1,5 @@
 
+
 using System.Text;
 using AegisCoreApi.Data;
 using AegisCoreApi.Middleware;
@@ -15,8 +16,13 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
-        // Load .env file
-        Env.Load("../.env");
+        // Load .env file (try multiple locations)
+        if (File.Exists(".env.production"))
+            Env.Load(".env.production");
+        else if (File.Exists(".env"))
+            Env.Load(".env");
+        else if (File.Exists("../.env"))
+            Env.Load("../.env");
         
         var builder = WebApplication.CreateBuilder(args);
         
@@ -40,8 +46,10 @@ public class Program
         var configuration = builder.Configuration;
         
         // Database - PostgreSQL
-        var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") 
-            ?? configuration.GetConnectionString("DefaultConnection")
+        var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL") 
+            ?? configuration.GetConnectionString("DefaultConnection");
+            
+        var connectionString = ConvertPostgresUrlToConnectionString(databaseUrl)
             ?? throw new InvalidOperationException("Database connection string not found");
         
         services.AddDbContext<AegisDbContext>(options =>
@@ -192,6 +200,90 @@ public class Program
         {
             logger.LogError(ex, "Error applying database migrations. Attempting to create database...");
             await context.Database.EnsureCreatedAsync();
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    /// <summary>
+    /// Converte uma URL de PostgreSQL para connection string do Npgsql
+    /// Exemplo: postgresql://user:pass@host:port/database -> Host=host;Port=port;Database=database;Username=user;Password=pass
+    /// </summary>
+    private static string? ConvertPostgresUrlToConnectionString(string? databaseUrl)
+    {
+        if (string.IsNullOrEmpty(databaseUrl))
+            return null;
+            
+        // Se já está no formato correto (contém "Host="), retorna como está
+        if (databaseUrl.Contains("Host=", StringComparison.OrdinalIgnoreCase))
+            return databaseUrl;
+            
+        try
+        {
+            // Parse da URL: postgresql://user:password@host:port/database
+            var uri = new Uri(databaseUrl);
+            
+            var userInfo = uri.UserInfo.Split(':');
+            var username = userInfo.Length > 0 ? userInfo[0] : "";
+            var password = userInfo.Length > 1 ? userInfo[1] : "";
+            var host = uri.Host;
+            var port = uri.Port > 0 ? uri.Port : 5432;
+            var database = uri.AbsolutePath.TrimStart('/');
+            
+            // Se database estiver vazio, usa o username como database (padrão do PostgreSQL)
+            if (string.IsNullOrEmpty(database))
+                database = username;
+            
+            var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
+            
+            // Procura certificados SSL (tenta várias localizações)
+            var basePaths = new[] { "..", ".", "../..", Environment.CurrentDirectory };
+            
+            string? caCertPath = null;
+            string? clientCertPath = null;
+            string? clientKeyPath = null;
+            
+            foreach (var basePath in basePaths)
+            {
+                var caTest = Path.Combine(basePath, "ca-certificate.crt");
+                var certTest = Path.Combine(basePath, "certificate.pem");
+                var keyTest = Path.Combine(basePath, "private-key.key");
+                
+                if (File.Exists(caTest)) caCertPath ??= Path.GetFullPath(caTest);
+                if (File.Exists(certTest)) clientCertPath ??= Path.GetFullPath(certTest);
+                if (File.Exists(keyTest)) clientKeyPath ??= Path.GetFullPath(keyTest);
+            }
+            
+            // Se tem todos os certificados (CA + cliente), usa autenticação completa
+            if (!string.IsNullOrEmpty(caCertPath) && !string.IsNullOrEmpty(clientCertPath) && !string.IsNullOrEmpty(clientKeyPath))
+            {
+                connectionString += $";SSL Mode=Require;Root Certificate={caCertPath};SSL Certificate={clientCertPath};SSL Key={clientKeyPath};Trust Server Certificate=true";
+                Console.WriteLine($"[DB] Using SSL with client certificate: {clientCertPath}");
+            }
+            // Se tem apenas CA certificate
+            else if (!string.IsNullOrEmpty(caCertPath))
+            {
+                connectionString += $";SSL Mode=VerifyCA;Root Certificate={caCertPath};Trust Server Certificate=true";
+                Console.WriteLine($"[DB] Using SSL with CA certificate: {caCertPath}");
+            }
+            // Fallback: tenta sem certificado cliente
+            else
+            {
+                connectionString += ";SSL Mode=Prefer;Trust Server Certificate=true";
+                Console.WriteLine("[DB] Using SSL without certificates");
+            }
+            
+            return connectionString;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[DB] Error parsing connection string: {ex.Message}");
+            return databaseUrl;
         }
     }
 }

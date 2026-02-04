@@ -74,3 +74,8 @@ Thumbs.db
 ca-certificate.crt
 certificate.pem
 private-key.key
+
+DEPLOY.md
+
+AegisCoreApi/.env.production
+AegisCoreWeb/.env.production

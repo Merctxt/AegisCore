@@ -8,8 +8,13 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        // Load .env file
-        Env.Load("../.env");
+        // Load .env file (try multiple locations)
+        if (File.Exists(".env.production"))
+            Env.Load(".env.production");
+        else if (File.Exists(".env"))
+            Env.Load(".env");
+        else if (File.Exists("../.env"))
+            Env.Load("../.env");
         
         var builder = WebApplication.CreateBuilder(args);
         
@@ -36,7 +41,10 @@ public class Program
             });
         
         // HTTP Client for API
-        var apiUrl = Environment.GetEnvironmentVariable("API_URL") ?? "http://localhost:5050";
+        var apiUrl = Environment.GetEnvironmentVariable("API_URL") 
+            ?? builder.Configuration["ApiSettings:BaseUrl"]
+            ?? "http://localhost:5050";
+            
         builder.Services.AddHttpClient("AegisApi", client =>
         {
             client.BaseAddress = new Uri(apiUrl);
@@ -47,6 +55,7 @@ public class Program
         builder.Services.AddScoped<IApiService, ApiService>();
         
         var app = builder.Build();
+
 
         // Configure the HTTP request pipeline
         if (!app.Environment.IsDevelopment())
