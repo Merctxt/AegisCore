@@ -1,6 +1,6 @@
-⬅️ [Voltar para o índice](../README.md)
+ [Voltar para o índice](../README.md)
 
-# 📊 Códigos de Status HTTP
+# Códigos de Status HTTP
 
 Esta página documenta todos os códigos de status HTTP retornados pela AegisCore API.
 

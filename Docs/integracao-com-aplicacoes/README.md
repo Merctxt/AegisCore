@@ -1,6 +1,6 @@
-⬅️ [Voltar para o índice](../README.md)
+ [Voltar para o índice](../README.md)
 
-# 🌐 Integração com Aplicações
+# Integração com Aplicações
 
 Guias práticos para integrar a AegisCore API em diferentes tipos de aplicações.
 

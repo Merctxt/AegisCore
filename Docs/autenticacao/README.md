@@ -1,6 +1,6 @@
-⬅️ [Voltar para o índice](../README.md)
+ [Voltar para o índice](../README.md)
 
-# 🔐 Autenticação
+# Autenticação
 
 A AegisCore API suporta dois métodos de autenticação: **JWT Token** e **API Key**.
 
@@ -74,7 +74,7 @@ Content-Type: application/json
 
 ---
 
-## 🔗 Webhooks
+## Webhooks
 
 Configure webhooks para receber notificações quando conteúdo tóxico for detectado.
 
@@ -126,7 +126,7 @@ X-Aegis-Signature: sha256=hash_hmac_do_payload
 
 ---
 
-## 🔒 Boas Práticas de Segurança
+## Boas Práticas de Segurança
 
 1. **Nunca exponha** sua API Key no frontend
 2. **Rotacione** suas API Keys periodicamente

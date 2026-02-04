@@ -1,10 +1,9 @@
-⬅️ [Voltar para o índice](../README.md)
+ [Voltar para o índice](../README.md)
 
-# ⚡ Rate Limiting
+# Rate Limiting
 
 A API implementa rate limiting para garantir estabilidade e uso justo dos recursos.
 
----
 
 ## Limites por Plano
 
@@ -53,7 +52,7 @@ Retry-After: 3600
 
 ---
 
-## ⚙️ Configuração Personalizada
+## Configuração Personalizada
 
 Para ajustar os limites (self-hosted), edite a configuração:
 

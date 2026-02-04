@@ -1,6 +1,6 @@
-⬅️ [Voltar para o índice](../README.md)
+ [Voltar para o índice](../README.md)
 
-# 💡 Exemplos de Uso
+# Exemplos de Uso
 
 Exemplos práticos de integração com a AegisCore API em diversas linguagens de programação.
 

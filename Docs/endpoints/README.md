@@ -1,6 +1,6 @@
-⬅️ [Voltar para o índice](../README.md)
+ [Voltar para o índice](../README.md)
 
-# 📡 Endpoints
+# Endpoints
 
 Documentação completa de todos os endpoints disponíveis na AegisCore API.
 
@@ -212,7 +212,7 @@ Authorization: Bearer seu_jwt_token
 
 ---
 
-## ⚙️ Thresholds Personalizados
+## Thresholds Personalizados
 
 Configure thresholds para cada tipo de análise:
 

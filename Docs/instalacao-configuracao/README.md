@@ -1,6 +1,6 @@
-⬅️ [Voltar para o índice](../README.md)
+ [Voltar para o índice](../README.md)
 
-# 🛠️ Instalação e Configuração
+# Instalação e Configuração
 
 ## Pré-requisitos
 
@@ -58,7 +58,7 @@ dotnet run --project AegisCoreWeb
 
 ---
 
-## 🐳 Docker (Em breve)
+## Docker (Em breve)
 
 ```dockerfile
 # Dockerfile disponível em breve
@@ -67,7 +67,7 @@ docker-compose up -d
 
 ---
 
-## 🚀 Deploy em Produção
+## Deploy em Produção
 
 ### Variáveis de Ambiente para Produção
 
@@ -104,7 +104,7 @@ ENTRYPOINT ["dotnet", "AegisCoreApi.dll"]
 
 ---
 
-## 🔒 Segurança
+## Segurança
 
 ### Boas Práticas
 
@@ -135,7 +135,7 @@ server {
 
 ---
 
-## 📈 Monitoramento
+## Monitoramento
 
 ### Health Check
 
@@ -153,14 +153,3 @@ Os logs incluem:
 - Erros da Perspective API
 - Rate limiting ativado
 - Estatísticas de uso
-
----
-
-## 🆘 Suporte
-
-Para problemas específicos da API:
-
-1. Verifique os logs do console
-2. Teste com `curl` ou Postman
-3. Confirme que a Perspective API está funcionando
-4. Verifique rate limits

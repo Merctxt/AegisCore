@@ -1,8 +1,8 @@
-# 🛡️ AegisCore - Documentação Técnica
+# AegisCore - Documentação Técnica
 
 API REST para moderação automática de conteúdo usando Google Perspective API. Este documento é destinado a desenvolvedores que desejam hospedar sua própria instância.
 
-## 📋 Índice
+## Índice
 
 1. [Instalação e Configuração](./instalacao-configuracao/README.md)
 2. [Autenticação](./autenticacao/README.md)
@@ -12,7 +12,7 @@ API REST para moderação automática de conteúdo usando Google Perspective API
 6. [Códigos de Status](./codigos-de-status/README.md)
 7. [Integração com Aplicações](./integracao-com-aplicacoes/README.md)
 
-## 🏗️ Arquitetura
+## Arquitetura
 
 ```
 AegisCore/
@@ -31,7 +31,7 @@ AegisCore/
 └── Docs/                  # Documentação
 ```
 
-## � Início Rápido
+## Início Rápido
 
 Para começar a usar a AegisCore API, siga os passos:
 
@@ -39,12 +39,3 @@ Para começar a usar a AegisCore API, siga os passos:
 2. **[Configure a autenticação](./autenticacao/README.md)** (JWT ou API Key)
 3. **[Consulte os endpoints](./endpoints/README.md)** disponíveis
 4. **[Veja exemplos práticos](./exemplos-de-uso/README.md)** em várias linguagens
-
-## 📄 Licença
-
-MIT License - Veja [LICENSE](../LICENSE) para mais detalhes.
-
----
-
-**Versão:** 1.0.0  
-**Última atualização:** Fevereiro 2026
