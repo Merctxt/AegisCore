@@ -1,0 +1,198 @@
+@{
+    ViewData["Title"] = "Termos de Serviço";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="fw-bold mb-4">Termos de Serviço</h1>
+            <p class="text-muted">Última atualização: @DateTime.Now.ToString("dd/MM/yyyy")</p>
+            
+            <hr class="my-4">
+            
+            <section class="mb-5">
+                <h2>1. Aceitação dos Termos</h2>
+                <p>
+                    Ao acessar ou usar o serviço AegisCore, você concorda em ficar vinculado a estes Termos de Serviço. 
+                    Se você não concordar com qualquer parte destes termos, não poderá acessar o serviço.
+                </p>
+            </section>
+            
+            <section class="mb-5">
+                <h2>2. Descrição do Serviço</h2>
+                <p>
+                    O AegisCore é uma API de moderação de conteúdo que utiliza inteligência artificial 
+                    (Google Perspective API) para analisar textos e detectar conteúdo potencialmente tóxico, 
+                    ofensivo ou inadequado.
+                </p>
+                <p>O serviço inclui:</p>
+                <ul>
+                    <li>API REST para análise de texto</li>
+                    <li>Dashboard para gerenciamento de API Keys</li>
+                    <li>Sistema de webhooks para notificações</li>
+                    <li>Diferentes planos com limites de uso</li>
+                </ul>
+            </section>
+            
+            <section class="mb-5">
+                <h2>3. Registro e Conta</h2>
+                <p>Para usar o serviço, você deve:</p>
+                <ul>
+                    <li>Criar uma conta com informações verdadeiras e atualizadas</li>
+                    <li>Ser maior de 18 anos ou ter autorização de um responsável legal</li>
+                    <li>Manter a segurança de suas credenciais e API Keys</li>
+                    <li>Notificar-nos imediatamente sobre qualquer uso não autorizado</li>
+                </ul>
+                <p>
+                    Você é responsável por todas as atividades que ocorrem em sua conta.
+                </p>
+            </section>
+            
+            <section class="mb-5">
+                <h2>4. Uso Aceitável</h2>
+                <p>Ao usar o AegisCore, você concorda em <strong>NÃO</strong>:</p>
+                <ul>
+                    <li>Usar o serviço para fins ilegais ou não autorizados</li>
+                    <li>Tentar contornar limites de uso ou medidas de segurança</li>
+                    <li>Compartilhar suas API Keys com terceiros não autorizados</li>
+                    <li>Enviar conteúdo ilegal (CSAM, terrorismo, etc.) para análise</li>
+                    <li>Usar o serviço para assediar, perseguir ou prejudicar outros</li>
+                    <li>Interferir ou interromper o funcionamento do serviço</li>
+                    <li>Coletar informações de outros usuários sem consentimento</li>
+                    <li>Revender ou redistribuir o serviço sem autorização</li>
+                </ul>
+            </section>
+            
+            <section class="mb-5">
+                <h2>5. Planos e Pagamentos</h2>
+                
+                <h5>5.1 Planos Disponíveis</h5>
+                <ul>
+                    <li><strong>Free:</strong> 100 requisições/dia, uso não comercial</li>
+                    <li><strong>Starter:</strong> 1.000 requisições/dia</li>
+                    <li><strong>Pro:</strong> 10.000 requisições/dia</li>
+                    <li><strong>Enterprise:</strong> Requisições ilimitadas, suporte dedicado</li>
+                </ul>
+                
+                <h5>5.2 Limites de Uso</h5>
+                <p>
+                    Cada plano possui limites diários de requisições. Ao atingir o limite, suas requisições 
+                    serão rejeitadas até o próximo dia (00:00 UTC). Você pode fazer upgrade do plano a qualquer momento.
+                </p>
+                
+                <h5>5.3 Política de Reembolso</h5>
+                <p>
+                    Pagamentos não são reembolsáveis, exceto conforme exigido por lei ou em casos excepcionais 
+                    a nosso critério.
+                </p>
+            </section>
+            
+            <section class="mb-5">
+                <h2>6. Propriedade Intelectual</h2>
+                <p>
+                    O serviço AegisCore, incluindo seu código, design, logotipos e documentação, é protegido 
+                    por direitos autorais e outras leis de propriedade intelectual.
+                </p>
+                <p>
+                    O código-fonte está disponível sob licença open-source no GitHub. Consulte o repositório 
+                    para detalhes sobre a licença aplicável.
+                </p>
+            </section>
+            
+            <section class="mb-5">
+                <h2>7. Isenção de Garantias</h2>
+                <p>
+                    O serviço é fornecido "COMO ESTÁ" e "CONFORME DISPONÍVEL", sem garantias de qualquer tipo, 
+                    expressas ou implícitas, incluindo, mas não se limitando a:
+                </p>
+                <ul>
+                    <li>Garantias de comercialização ou adequação a um fim específico</li>
+                    <li>Garantia de que o serviço será ininterrupto ou livre de erros</li>
+                    <li>Garantia de precisão absoluta nas análises de moderação</li>
+                </ul>
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Importante:</strong> A análise de moderação é baseada em IA e pode conter erros. 
+                    Recomendamos revisão humana para decisões críticas.
+                </div>
+            </section>
+            
+            <section class="mb-5">
+                <h2>8. Limitação de Responsabilidade</h2>
+                <p>
+                    Em nenhuma circunstância a AegisCore será responsável por quaisquer danos indiretos, 
+                    incidentais, especiais, consequenciais ou punitivos, incluindo perda de lucros, dados, 
+                    uso ou outras perdas intangíveis, resultantes de:
+                </p>
+                <ul>
+                    <li>Uso ou incapacidade de usar o serviço</li>
+                    <li>Falsos positivos ou negativos na detecção de conteúdo</li>
+                    <li>Acesso não autorizado à sua conta</li>
+                    <li>Interrupções do serviço</li>
+                </ul>
+            </section>
+            
+            <section class="mb-5">
+                <h2>9. Disponibilidade do Serviço</h2>
+                <p>
+                    Nos esforçamos para manter o serviço disponível 24/7, mas não garantimos disponibilidade 
+                    ininterrupta. Podemos realizar manutenções programadas ou de emergência que podem resultar 
+                    em indisponibilidade temporária.
+                </p>
+                <p>
+                    Reservamos o direito de modificar, suspender ou descontinuar o serviço a qualquer momento, 
+                    com ou sem aviso prévio.
+                </p>
+            </section>
+            
+            <section class="mb-5">
+                <h2>10. Encerramento</h2>
+                <p>
+                    Podemos encerrar ou suspender sua conta imediatamente, sem aviso prévio, por qualquer motivo, 
+                    incluindo, mas não se limitando a:
+                </p>
+                <ul>
+                    <li>Violação destes Termos de Serviço</li>
+                    <li>Uso abusivo do serviço</li>
+                    <li>Não pagamento (para planos pagos)</li>
+                    <li>Solicitação do próprio usuário</li>
+                </ul>
+                <p>
+                    Você pode encerrar sua conta a qualquer momento através das configurações da conta.
+                </p>
+            </section>
+            
+            <section class="mb-5">
+                <h2>11. Alterações nos Termos</h2>
+                <p>
+                    Reservamos o direito de modificar estes termos a qualquer momento. Alterações significativas 
+                    serão notificadas por e-mail ou através do site. O uso continuado do serviço após as alterações 
+                    constitui aceitação dos novos termos.
+                </p>
+            </section>
+            
+            <section class="mb-5">
+                <h2>12. Lei Aplicável</h2>
+                <p>
+                    Estes termos serão regidos e interpretados de acordo com as leis do Brasil, 
+                    independentemente de conflitos de disposições legais.
+                </p>
+            </section>
+            
+            <section class="mb-5">
+                <h2>13. Contato</h2>
+                <p>
+                    Para questões sobre estes Termos de Serviço:
+                </p>
+                <ul>
+                    <li>GitHub: <a href="https://github.com/Merctxt/AegisCore" target="_blank">github.com/Merctxt/AegisCore</a></li>
+                </ul>
+            </section>
+            
+            <div class="alert alert-primary">
+                <i class="bi bi-check-circle me-2"></i>
+                Ao criar uma conta ou usar o AegisCore, você confirma que leu, entendeu e concorda com estes Termos de Serviço.
+            </div>
+        </div>
+    </div>
+</div>
