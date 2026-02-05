@@ -1,0 +1,132 @@
+@{
+    ViewData["Title"] = "Configurações";
+}
+
+<div class="container py-4">
+    <h2 class="fw-bold mb-4">Configurações</h2>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Profile -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0"><i class="bi bi-person me-2"></i>Perfil</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Nome</label>
+                            <input type="text" class="form-control" value="@User.Identity?.Name" disabled />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" value="@User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value" disabled />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Plano Atual</label>
+                            <input type="text" class="form-control" value="@(User.FindFirst("plan")?.Value ?? "Free")" disabled />
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Change Password -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0"><i class="bi bi-lock me-2"></i>Alterar Senha</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-controller="Account" asp-action="ChangePassword" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="mb-3">
+                            <label class="form-label">Senha Atual</label>
+                            <input type="password" name="currentPassword" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nova Senha</label>
+                            <input type="password" name="newPassword" class="form-control" minlength="8" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Confirmar Nova Senha</label>
+                            <input type="password" name="confirmPassword" class="form-control" minlength="8" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary">Alterar Senha</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Danger Zone -->
+            <div class="card border-danger mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Zona de Perigo</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Ações irreversíveis. Tenha cuidado!</p>
+                    <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                        <i class="bi bi-trash me-1"></i>Excluir Conta
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Plan Info -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-4 mb-3">
+                        <i class="bi bi-star-fill text-primary fs-1"></i>
+                    </div>
+                    <h5>Plano @(User.FindFirst("plan")?.Value ?? "Free")</h5>
+                    <p class="text-muted small">
+                        @switch(User.FindFirst("plan")?.Value ?? "Free")
+                        {
+                            case "Free":
+                                @:100 requisições/dia
+                                break;
+                            case "Starter":
+                                @:1.000 requisições/dia
+                                break;
+                            case "Pro":
+                                @:10.000 requisições/dia
+                                break;
+                            default:
+                                @:Ilimitado
+                                break;
+                        }
+                    </p>
+                    <a asp-controller="Home" asp-action="Pricing" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-arrow-up-circle me-1"></i>Fazer Upgrade
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Excluir Conta</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir sua conta? Esta ação é <strong>irreversível</strong>.</p>
+                <p>Todos os seus dados serão permanentemente apagados:</p>
+                <ul>
+                    <li>API Keys</li>
+                    <li>Webhooks</li>
+                    <li>Histórico de requisições</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form asp-controller="Account" asp-action="DeleteAccount" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Sim, Excluir Minha Conta</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

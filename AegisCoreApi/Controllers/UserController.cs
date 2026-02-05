@@ -137,6 +137,42 @@ public class UserController : ControllerBase
         return Ok(new { message = "Password changed successfully" });
     }
     
+    /// <summary>
+    /// Delete user account and all associated data
+    /// </summary>
+    [HttpDelete("me")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteAccount()
+    {
+        var userId = GetUserId();
+        if (userId == null) return Unauthorized();
+        
+        var user = await _context.Users
+            .Include(u => u.ApiKeys)
+            .Include(u => u.Webhooks)
+            .FirstOrDefaultAsync(u => u.Id == userId.Value);
+            
+        if (user == null) return NotFound();
+        
+        // Delete all associated data
+        _context.ApiKeys.RemoveRange(user.ApiKeys);
+        _context.Webhooks.RemoveRange(user.Webhooks);
+        
+        // Delete request logs
+        var logs = await _context.RequestLogs.Where(l => l.UserId == userId.Value).ToListAsync();
+        _context.RequestLogs.RemoveRange(logs);
+        
+        // Delete user
+        _context.Users.Remove(user);
+        
+        await _context.SaveChangesAsync();
+        
+        _logger.LogInformation("User account deleted: {UserId}", userId);
+        
+        return Ok(new { message = "Account deleted successfully" });
+    }
+    
     private Guid? GetUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

@@ -1,5 +1,4 @@
 using AegisCoreWeb.Services;
-using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace AegisCoreWeb;
@@ -8,15 +7,13 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        // Load .env file (try multiple locations)
-        if (File.Exists(".env.production"))
-            Env.Load(".env.production");
-        else if (File.Exists(".env"))
-            Env.Load(".env");
-        else if (File.Exists("../.env"))
-            Env.Load("../.env");
-        
         var builder = WebApplication.CreateBuilder(args);
+        
+        // Determina a URL da API a partir do appsettings
+        var apiUrl = builder.Configuration["Urls:Api"] ?? "http://localhost:5050";
+        
+        Console.WriteLine($"[CONFIG] Environment: {builder.Environment.EnvironmentName}");
+        Console.WriteLine($"[CONFIG] API URL: {apiUrl}");
         
         // Add services to the container
         builder.Services.AddControllersWithViews();
@@ -41,15 +38,14 @@ public class Program
             });
         
         // HTTP Client for API
-        var apiUrl = Environment.GetEnvironmentVariable("API_URL") 
-            ?? builder.Configuration["ApiSettings:BaseUrl"]
-            ?? "http://localhost:5050";
-            
         builder.Services.AddHttpClient("AegisApi", client =>
         {
             client.BaseAddress = new Uri(apiUrl);
             client.DefaultRequestHeaders.Add("Accept", "application/json");
         });
+        
+        // Registra a URL da API para uso nas Views
+        builder.Services.AddSingleton(new AppSettings { ApiUrl = apiUrl });
         
         // Services
         builder.Services.AddScoped<IApiService, ApiService>();

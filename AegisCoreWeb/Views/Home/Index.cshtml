@@ -1,4 +1,8 @@
-﻿@{
+﻿@inject AegisCoreWeb.AppSettings AppSettings
+@{
+    var apiUrl = AppSettings.ApiUrl;
+}
+@{
     ViewData["Title"] = "Moderação de Conteúdo com IA";
 }
 
@@ -18,7 +22,7 @@
                     <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-lg">
                         <i class="bi bi-rocket-takeoff me-2"></i>Começar Grátis
                     </a>
-                    <a href="/swagger" class="btn btn-outline-light btn-lg" target="_blank">
+                    <a href="@apiUrl/swagger" class="btn btn-outline-light btn-lg" target="_blank">
                         <i class="bi bi-code-slash me-2"></i>Ver API
                     </a>
                 </div>

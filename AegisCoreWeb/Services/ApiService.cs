@@ -60,6 +60,8 @@ public class ApiService : IApiService
             var json = JsonSerializer.Serialize(data, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             
+            _logger.LogInformation("POST {Endpoint} with token: {HasToken}", endpoint, !string.IsNullOrEmpty(token));
+            
             var response = await client.PostAsync(endpoint, content);
             var responseContent = await response.Content.ReadAsStringAsync();
             

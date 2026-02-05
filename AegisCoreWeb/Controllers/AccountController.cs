@@ -110,6 +110,64 @@ public class AccountController : Controller
         return RedirectToAction("Index", "Home");
     }
     
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ChangePassword(string currentPassword, string newPassword, string confirmPassword)
+    {
+        if (newPassword != confirmPassword)
+        {
+            TempData["Error"] = "As senhas não coincidem";
+            return RedirectToAction("Settings", "Dashboard");
+        }
+        
+        if (newPassword.Length < 8)
+        {
+            TempData["Error"] = "A nova senha deve ter pelo menos 8 caracteres";
+            return RedirectToAction("Settings", "Dashboard");
+        }
+        
+        var token = HttpContext.Session.GetString("Token") ?? User.FindFirst("token")?.Value;
+        
+        // Usa a rota do UserController que já existe
+        var result = await _apiService.PostAsync<object>("api/user/change-password", new
+        {
+            currentPassword,
+            newPassword
+        }, token);
+        
+        if (result != null)
+        {
+            TempData["Success"] = "Senha alterada com sucesso!";
+        }
+        else
+        {
+            TempData["Error"] = "Senha atual incorreta";
+        }
+        
+        
+        return RedirectToAction("Settings", "Dashboard");
+    }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteAccount()
+    {
+        var token = HttpContext.Session.GetString("Token") ?? User.FindFirst("token")?.Value;
+        
+        var result = await _apiService.DeleteAsync("api/user/me", token);
+        
+        if (result)
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            HttpContext.Session.Clear();
+            TempData["Success"] = "Sua conta foi excluída permanentemente";
+            return RedirectToAction("Index", "Home");
+        }
+        
+        TempData["Error"] = "Erro ao excluir conta. Tente novamente.";
+        return RedirectToAction("Settings", "Dashboard");
+    }
+    
     private async Task SignInUserAsync(AuthResponse response, bool isPersistent)
     {
         var claims = new List<Claim>

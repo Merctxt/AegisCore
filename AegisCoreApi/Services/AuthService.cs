@@ -84,16 +84,18 @@ public class AuthService : IAuthService
         try
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"] ?? throw new InvalidOperationException("JWT Secret not configured"));
+            var secret = _configuration["Jwt:Secret"] 
+                ?? throw new InvalidOperationException("JWT Secret not configured");
+            var key = Encoding.UTF8.GetBytes(secret);
             
             var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
                 ValidateIssuer = true,
-                ValidIssuer = _configuration["Jwt:Issuer"],
+                ValidIssuer = _configuration["Jwt:Issuer"] ?? "AegisCore",
                 ValidateAudience = true,
-                ValidAudience = _configuration["Jwt:Audience"],
+                ValidAudience = _configuration["Jwt:Audience"] ?? "AegisCoreUsers",
                 ClockSkew = TimeSpan.Zero
             }, out _);
             
@@ -113,7 +115,9 @@ public class AuthService : IAuthService
     
     public string GenerateJwtToken(User user)
     {
-        var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"] ?? throw new InvalidOperationException("JWT Secret not configured"));
+        var secret = _configuration["Jwt:Secret"] 
+            ?? throw new InvalidOperationException("JWT Secret not configured");
+        var key = Encoding.UTF8.GetBytes(secret);
         
         var claims = new[]
         {
@@ -124,8 +128,8 @@ public class AuthService : IAuthService
         };
         
         var token = new JwtSecurityToken(
-            issuer: _configuration["Jwt:Issuer"],
-            audience: _configuration["Jwt:Audience"],
+            issuer: _configuration["Jwt:Issuer"] ?? "AegisCore",
+            audience: _configuration["Jwt:Audience"] ?? "AegisCoreUsers",
             claims: claims,
             expires: DateTime.UtcNow.AddDays(7),
             signingCredentials: new SigningCredentials(

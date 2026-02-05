@@ -1,5 +1,6 @@
-﻿@{
-    var apiUrl = Environment.GetEnvironmentVariable("API_URL") ?? "http://localhost:5050";
+﻿@inject AegisCoreWeb.AppSettings AppSettings
+@{
+    var apiUrl = AppSettings.ApiUrl;
 }
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -42,62 +43,62 @@
                     <ul class="navbar-nav">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Dashboard" asp-action="Index">
-                                    <i class="bi bi-speedometer2 me-1"></i>Dashboard
-                                </a>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                    <i class="bi bi-person-circle me-1"></i>@User.Identity.Name
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" asp-controller="Dashboard" asp-action="Settings">Configurações</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <form asp-controller="Account" asp-action="Logout" method="post">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="dropdown-item text-danger">
-                                                <i class="bi bi-box-arrow-right me-1"></i>Sair
-                                            </button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Dashboard" asp-action="Index">
+                                <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle me-1"></i>@User.Identity.Name
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" asp-controller="Dashboard" asp-action="Settings">Configurações</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form asp-controller="Account" asp-action="Logout" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="bi bi-box-arrow-right me-1"></i>Sair
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
                         }
                         else
                         {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Login">Entrar</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="btn btn-primary ms-2" asp-controller="Account" asp-action="Register">Criar Conta</a>
-                            </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="Login">Entrar</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-primary ms-2" asp-controller="Account" asp-action="Register">Criar Conta</a>
+                        </li>
                         }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    
+
     <main>
         @if (TempData["Success"] != null)
         {
-            <div class="container mt-3">
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+        <div class="container mt-3">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
+        </div>
         }
         @if (TempData["Error"] != null)
         {
-            <div class="container mt-3">
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="bi bi-exclamation-triangle me-2"></i>@TempData["Error"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+        <div class="container mt-3">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>@TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
+        </div>
         }
         @RenderBody()
     </main>
@@ -119,7 +120,7 @@
                     <ul class="list-unstyled">
                         <li><a href="#" class="text-decoration-none">Recursos</a></li>
                         <li><a asp-controller="Home" asp-action="Pricing" class="text-decoration-none">Preços</a></li>
-                        <li><a href="/swagger" class="text-decoration-none">API</a></li>
+                        <li><a href="@apiUrl/swagger" class="text-decoration-none">API</a></li>
                     </ul>
                 </div>
                 <div class="col-md-2 mb-4">
@@ -143,21 +144,21 @@
             </div>
         </div>
     </footer>
-    
+
     <!--Start of Tawk.to Script-->
-        <script type="text/javascript">
-        var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-        (function(){
-        var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-        s1.async=true;
-        s1.src='https://embed.tawk.to/698292096273081c3ac0daba/1jgj0kt9v';
-        s1.charset='UTF-8';
-        s1.setAttribute('crossorigin','*');
-        s0.parentNode.insertBefore(s1,s0);
+    <script type="text/javascript">
+        var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
+        (function () {
+            var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
+            s1.async = true;
+            s1.src = 'https://embed.tawk.to/698292096273081c3ac0daba/1jgj0kt9v';
+            s1.charset = 'UTF-8';
+            s1.setAttribute('crossorigin', '*');
+            s0.parentNode.insertBefore(s1, s0);
         })();
-        </script>
+    </script>
     <!--End of Tawk.to Script-->
-    
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
