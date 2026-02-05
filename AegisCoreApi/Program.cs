@@ -4,7 +4,6 @@ using System.Text;
 using AegisCoreApi.Data;
 using AegisCoreApi.Middleware;
 using AegisCoreApi.Services;
-using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -16,15 +15,9 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
-        // Load .env file (try multiple locations)
-        if (File.Exists(".env.production"))
-            Env.Load(".env.production");
-        else if (File.Exists(".env"))
-            Env.Load(".env");
-        else if (File.Exists("../.env"))
-            Env.Load("../.env");
-        
         var builder = WebApplication.CreateBuilder(args);
+        
+        Console.WriteLine($"[CONFIG] Environment: {builder.Environment.EnvironmentName}");
         
         // ========== Configuration ==========
         ConfigureServices(builder);
@@ -46,18 +39,14 @@ public class Program
         var configuration = builder.Configuration;
         
         // Database - PostgreSQL
-        var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL") 
-            ?? configuration.GetConnectionString("DefaultConnection");
-            
-        var connectionString = ConvertPostgresUrlToConnectionString(databaseUrl)
-            ?? throw new InvalidOperationException("Database connection string not found");
+        var connectionString = BuildConnectionString(configuration);
+        Console.WriteLine($"[CONFIG] Database Host: {configuration["Database:Host"]}");
         
         services.AddDbContext<AegisDbContext>(options =>
             options.UseNpgsql(connectionString));
         
         // JWT Authentication
-        var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET") 
-            ?? configuration["Jwt:Secret"] 
+        var jwtSecret = configuration["Jwt:Secret"] 
             ?? throw new InvalidOperationException("JWT Secret not configured");
         
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -110,12 +99,13 @@ public class Program
             // API Key Auth
             c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
             {
-                Description = "API Key for accessing moderation endpoints",
+                Description = "API Key for moderation endpoints. Enter your key (e.g., aegis_xxxxx)",
                 Name = "X-Api-Key",
                 In = ParameterLocation.Header,
                 Type = SecuritySchemeType.ApiKey
             });
             
+            // Add both security schemes - endpoints will use one or the other
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
@@ -125,6 +115,17 @@ public class Program
                         {
                             Type = ReferenceType.SecurityScheme,
                             Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                },
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "ApiKey"
                         }
                     },
                     Array.Empty<string>()
@@ -177,6 +178,7 @@ public class Program
         
         app.MapControllers();
         
+        
         // Health check endpoint
         app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
         
@@ -203,87 +205,22 @@ public class Program
         }
     }
     
-    
-    
-    
-    
-    
-    
-    
     /// <summary>
-    /// Converte uma URL de PostgreSQL para connection string do Npgsql
-    /// Exemplo: postgresql://user:pass@host:port/database -> Host=host;Port=port;Database=database;Username=user;Password=pass
+    /// Constrói a connection string do PostgreSQL a partir do appsettings
     /// </summary>
-    private static string? ConvertPostgresUrlToConnectionString(string? databaseUrl)
+    private static string BuildConnectionString(IConfiguration configuration)
     {
-        if (string.IsNullOrEmpty(databaseUrl))
-            return null;
-            
-        // Se já está no formato correto (contém "Host="), retorna como está
-        if (databaseUrl.Contains("Host=", StringComparison.OrdinalIgnoreCase))
-            return databaseUrl;
-            
-        try
-        {
-            // Parse da URL: postgresql://user:password@host:port/database
-            var uri = new Uri(databaseUrl);
-            
-            var userInfo = uri.UserInfo.Split(':');
-            var username = userInfo.Length > 0 ? userInfo[0] : "";
-            var password = userInfo.Length > 1 ? userInfo[1] : "";
-            var host = uri.Host;
-            var port = uri.Port > 0 ? uri.Port : 5432;
-            var database = uri.AbsolutePath.TrimStart('/');
-            
-            // Se database estiver vazio, usa o username como database (padrão do PostgreSQL)
-            if (string.IsNullOrEmpty(database))
-                database = username;
-            
-            var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
-            
-            // Procura certificados SSL (tenta várias localizações)
-            var basePaths = new[] { "..", ".", "../..", Environment.CurrentDirectory };
-            
-            string? caCertPath = null;
-            string? clientCertPath = null;
-            string? clientKeyPath = null;
-            
-            foreach (var basePath in basePaths)
-            {
-                var caTest = Path.Combine(basePath, "ca-certificate.crt");
-                var certTest = Path.Combine(basePath, "certificate.pem");
-                var keyTest = Path.Combine(basePath, "private-key.key");
-                
-                if (File.Exists(caTest)) caCertPath ??= Path.GetFullPath(caTest);
-                if (File.Exists(certTest)) clientCertPath ??= Path.GetFullPath(certTest);
-                if (File.Exists(keyTest)) clientKeyPath ??= Path.GetFullPath(keyTest);
-            }
-            
-            // Se tem todos os certificados (CA + cliente), usa autenticação completa
-            if (!string.IsNullOrEmpty(caCertPath) && !string.IsNullOrEmpty(clientCertPath) && !string.IsNullOrEmpty(clientKeyPath))
-            {
-                connectionString += $";SSL Mode=Require;Root Certificate={caCertPath};SSL Certificate={clientCertPath};SSL Key={clientKeyPath};Trust Server Certificate=true";
-                Console.WriteLine($"[DB] Using SSL with client certificate: {clientCertPath}");
-            }
-            // Se tem apenas CA certificate
-            else if (!string.IsNullOrEmpty(caCertPath))
-            {
-                connectionString += $";SSL Mode=VerifyCA;Root Certificate={caCertPath};Trust Server Certificate=true";
-                Console.WriteLine($"[DB] Using SSL with CA certificate: {caCertPath}");
-            }
-            // Fallback: tenta sem certificado cliente
-            else
-            {
-                connectionString += ";SSL Mode=Prefer;Trust Server Certificate=true";
-                Console.WriteLine("[DB] Using SSL without certificates");
-            }
-            
-            return connectionString;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[DB] Error parsing connection string: {ex.Message}");
-            return databaseUrl;
-        }
+        var host = configuration["Database:Host"] ?? "localhost";
+        var port = configuration["Database:Port"] ?? "5432";
+        var database = configuration["Database:Name"] ?? "aegiscore";
+        var username = configuration["Database:Username"] ?? "postgres";
+        var password = configuration["Database:Password"] ?? "postgres";
+        
+        var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
+        
+        // Supabase e outros provedores cloud precisam de SSL
+        connectionString += ";SSL Mode=Prefer;Trust Server Certificate=true";
+        
+        return connectionString;
     }
 }
