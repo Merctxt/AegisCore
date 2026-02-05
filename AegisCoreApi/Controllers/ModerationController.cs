@@ -77,7 +77,8 @@ public class ModerationController : ControllerBase
         var result = await _perspectiveService.AnalyzeTextAsync(
             request.Text, 
             request.Language ?? "pt", 
-            request.IncludeAllScores);
+            request.IncludeAllScores,
+            request.ToxicityThreshold);
         
         stopwatch.Stop();
         
@@ -145,9 +146,11 @@ public class ModerationController : ControllerBase
             return Unauthorized(new { error = "Invalid API Key" });
         }
         
+        
         var result = await _perspectiveService.AnalyzeBatchAsync(
             request.Texts, 
-            request.Language ?? "pt");
+            request.Language ?? "pt",
+            request.ToxicityThreshold);
         
         // Increment usage for each text
         for (int i = 0; i < request.Texts.Count; i++)

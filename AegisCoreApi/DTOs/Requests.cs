@@ -76,12 +76,14 @@ public record ApiKeyCreatedResponse(
 public record ModerationRequest(
     [Required] string Text,
     string? Language = "pt",
-    bool IncludeAllScores = false
+    bool IncludeAllScores = false,
+    double? ToxicityThreshold = null  // Se não informado, usa o padrão do appsettings (0.7)
 );
 
 public record ModerationResponse(
     bool IsToxic,
     double ToxicityScore,
+    double ThresholdUsed,
     Dictionary<string, double>? AllScores,
     string AnalyzedText,
     DateTime Timestamp
@@ -89,7 +91,8 @@ public record ModerationResponse(
 
 public record BatchModerationRequest(
     [Required] List<string> Texts,
-    string? Language = "pt"
+    string? Language = "pt",
+    double? ToxicityThreshold = null
 );
 
 public record BatchModerationResponse(
