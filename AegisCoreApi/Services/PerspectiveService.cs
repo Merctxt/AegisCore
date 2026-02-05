@@ -34,13 +34,21 @@ public class PerspectiveService : IPerspectiveService
             return CreateMockResponse(text, includeAllScores);
         }
         
+        _logger.LogInformation("Calling Perspective API for text analysis");
+        
         try
         {
             var requestBody = CreateRequestBody(text, language, includeAllScores);
             var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
             
             var response = await _httpClient.PostAsync($"{PerspectiveApiUrl}?key={apiKey}", content);
-            response.EnsureSuccessStatusCode();
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                _logger.LogError("Perspective API error: {StatusCode} - {Content}", response.StatusCode, errorContent);
+                return CreateMockResponse(text, includeAllScores);
+            }
             
             var responseJson = await response.Content.ReadAsStringAsync();
             return ParseResponse(responseJson, text, includeAllScores);
