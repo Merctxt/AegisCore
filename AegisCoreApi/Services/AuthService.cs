@@ -79,14 +79,19 @@ public class AuthService : IAuthService
         return await _context.Users.FindAsync(userId);
     }
     
+    private string GetJwtSecret()
+    {
+        return Environment.GetEnvironmentVariable("JWT_SECRET")
+            ?? _configuration["Jwt:Secret"]
+            ?? throw new InvalidOperationException("JWT Secret not configured");
+    }
+    
     public async Task<User?> ValidateTokenAsync(string token)
     {
         try
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var secret = _configuration["Jwt:Secret"] 
-                ?? throw new InvalidOperationException("JWT Secret not configured");
-            var key = Encoding.UTF8.GetBytes(secret);
+            var key = Encoding.UTF8.GetBytes(GetJwtSecret());
             
             var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
             {
@@ -115,9 +120,7 @@ public class AuthService : IAuthService
     
     public string GenerateJwtToken(User user)
     {
-        var secret = _configuration["Jwt:Secret"] 
-            ?? throw new InvalidOperationException("JWT Secret not configured");
-        var key = Encoding.UTF8.GetBytes(secret);
+        var key = Encoding.UTF8.GetBytes(GetJwtSecret());
         
         var claims = new[]
         {

@@ -38,16 +38,19 @@ public class Program
         var services = builder.Services;
         var configuration = builder.Configuration;
         
+        
         // Database - PostgreSQL
         var connectionString = BuildConnectionString(configuration);
-        Console.WriteLine($"[CONFIG] Database Host: {configuration["Database:Host"]}");
         
         services.AddDbContext<AegisDbContext>(options =>
             options.UseNpgsql(connectionString));
         
-        // JWT Authentication
-        var jwtSecret = configuration["Jwt:Secret"] 
+        // JWT Authentication (prioridade: variável de ambiente > appsettings)
+        var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET")
+            ?? configuration["Jwt:Secret"] 
             ?? throw new InvalidOperationException("JWT Secret not configured");
+        
+        Console.WriteLine($"[CONFIG] JWT Secret configured: {!string.IsNullOrEmpty(jwtSecret)}");
         
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
@@ -206,21 +209,67 @@ public class Program
     }
     
     /// <summary>
-    /// Constrói a connection string do PostgreSQL a partir do appsettings
+    /// Constrói a connection string do PostgreSQL
+    /// Prioridade: 1) DATABASE_URL (Railway/Heroku), 2) Variáveis separadas, 3) appsettings.json
     /// </summary>
     private static string BuildConnectionString(IConfiguration configuration)
     {
+        // 1. Tenta DATABASE_URL (formato: postgresql://user:pass@host:port/database)
+        var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+        if (!string.IsNullOrEmpty(databaseUrl))
+        {
+            Console.WriteLine("[DB] Using DATABASE_URL from environment");
+            return ConvertPostgresUrl(databaseUrl);
+        }
+        
+        // 2. Tenta variáveis de ambiente separadas
+        var envHost = Environment.GetEnvironmentVariable("DB_HOST");
+        if (!string.IsNullOrEmpty(envHost))
+        {
+            Console.WriteLine("[DB] Using DB_* environment variables");
+            var envPort = Environment.GetEnvironmentVariable("DB_PORT") ?? "5432";
+            var envDatabase = Environment.GetEnvironmentVariable("DB_NAME") ?? "postgres";
+            var envUsername = Environment.GetEnvironmentVariable("DB_USERNAME") ?? "postgres";
+            var envPassword = Environment.GetEnvironmentVariable("DB_PASSWORD") ?? "";
+            
+            return $"Host={envHost};Port={envPort};Database={envDatabase};Username={envUsername};Password={envPassword};SSL Mode=Prefer;Trust Server Certificate=true";
+        }
+        
+        // 3. Usa appsettings.json
+        Console.WriteLine("[DB] Using appsettings.json configuration");
         var host = configuration["Database:Host"] ?? "localhost";
         var port = configuration["Database:Port"] ?? "5432";
         var database = configuration["Database:Name"] ?? "aegiscore";
         var username = configuration["Database:Username"] ?? "postgres";
         var password = configuration["Database:Password"] ?? "postgres";
         
-        var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
-        
-        // Supabase e outros provedores cloud precisam de SSL
-        connectionString += ";SSL Mode=Prefer;Trust Server Certificate=true";
-        
-        return connectionString;
+        return $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Prefer;Trust Server Certificate=true";
+    }
+    
+    /// <summary>
+    /// Converte URL do PostgreSQL para connection string do Npgsql
+    /// postgresql://user:pass@host:port/database -> Host=host;Port=port;...
+    /// </summary>
+    private static string ConvertPostgresUrl(string url)
+    {
+        try
+        {
+            var uri = new Uri(url);
+            var userInfo = uri.UserInfo.Split(':');
+            var username = userInfo.Length > 0 ? userInfo[0] : "postgres";
+            var password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : "";
+            var host = uri.Host;
+            var port = uri.Port > 0 ? uri.Port : 5432;
+            var database = uri.AbsolutePath.TrimStart('/');
+            
+            if (string.IsNullOrEmpty(database)) database = "postgres";
+            
+            return $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Prefer;Trust Server Certificate=true";
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[DB] Error parsing DATABASE_URL: {ex.Message}");
+            throw;
+        }
     }
 }

@@ -1,0 +1,54 @@
+# Docker Compose para desenvolvimento local
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: AegisCoreApi/Dockerfile
+    ports:
+      - "5050:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/aegiscore
+      - JWT_SECRET=AegisCore-Super-Secret-Key-For-JWT-Token-2025!
+      - PERSPECTIVE_API_KEY=${PERSPECTIVE_API_KEY}
+      - CORS_ORIGINS=http://localhost:5100
+    depends_on:
+      - db
+    networks:
+      - aegis-network
+
+  web:
+    build:
+      context: .
+      dockerfile: AegisCoreWeb/Dockerfile
+    ports:
+      - "5100:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - API_URL=http://api:80
+    depends_on:
+      - api
+    networks:
+      - aegis-network
+
+  db:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=aegiscore
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - aegis-network
+
+networks:
+  aegis-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

@@ -31,10 +31,14 @@ public class PerspectiveService : IPerspectiveService
             System.Globalization.CultureInfo.InvariantCulture, out var threshold) ? threshold : 0.7;
     }
     
+    
     public async Task<ModerationResponse> AnalyzeTextAsync(string text, string language = "pt", bool includeAllScores = false, double? threshold = null)
     {
         var effectiveThreshold = threshold ?? GetDefaultThreshold();
-        var apiKey = _configuration["PerspectiveApi:ApiKey"];
+        
+        // Prioridade: variável de ambiente > appsettings
+        var apiKey = Environment.GetEnvironmentVariable("PERSPECTIVE_API_KEY")
+            ?? _configuration["PerspectiveApi:ApiKey"];
         
         _logger.LogInformation("Threshold: {Threshold}", effectiveThreshold);
         

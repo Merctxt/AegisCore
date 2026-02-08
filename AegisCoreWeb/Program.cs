@@ -9,14 +9,17 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         
-        // Determina a URL da API a partir do appsettings
-        var apiUrl = builder.Configuration["Urls:Api"] ?? "http://localhost:5050";
+        // Determina a URL da API (prioridade: variável de ambiente > appsettings)
+        var apiUrl = Environment.GetEnvironmentVariable("API_URL")
+            ?? builder.Configuration["Urls:Api"] 
+            ?? "http://localhost:5050";
         
         Console.WriteLine($"[CONFIG] Environment: {builder.Environment.EnvironmentName}");
         Console.WriteLine($"[CONFIG] API URL: {apiUrl}");
         
         // Add services to the container
         builder.Services.AddControllersWithViews();
+        
         
         // Session
         builder.Services.AddDistributedMemoryCache();
