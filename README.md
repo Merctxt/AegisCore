@@ -12,15 +12,10 @@ Sistema completo de moderação automática de conteúdo utilizando Google Persp
 - **Webhooks** para notificações de conteúdo tóxico
 - **Logs de requisições** para auditoria
 
-### Dashboard Web (AegisCoreWeb)
-- **Interface web** para gerenciamento
-- **Gerenciamento de API Keys**
-- **Visualização de estatísticas**
-- **Configuração de webhooks**
 
 ## Pré-requisitos
 
-- .NET 10 SDK
+- .NET 9 SDK
 - PostgreSQL 14+
 - Google Perspective API Key
 
