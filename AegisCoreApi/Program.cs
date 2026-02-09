@@ -96,20 +96,21 @@ public class Program
                 }
             });
             
-            // JWT Auth
+            // JWT Auth - usando Http scheme para adicionar Bearer automaticamente
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
-                Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token.",
+                Description = "JWT Token. Cole apenas o token (sem 'Bearer'). Exemplo: eyJhbGciOiJIUzI1NiIs...",
                 Name = "Authorization",
                 In = ParameterLocation.Header,
-                Type = SecuritySchemeType.ApiKey,
-                Scheme = "Bearer"
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT"
             });
             
             // API Key Auth
             c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
             {
-                Description = "API Key for moderation endpoints. Enter your key (e.g., aegis_xxxxx)",
+                Description = "API Key para endpoints de moderacao. Exemplo: aegis_xxxxx",
                 Name = "X-Api-Key",
                 In = ParameterLocation.Header,
                 Type = SecuritySchemeType.ApiKey
