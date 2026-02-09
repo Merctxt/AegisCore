@@ -40,11 +40,22 @@ public class Program
                 options.SlidingExpiration = true;
             });
         
-        // HTTP Client for API
+        // HTTP Client for API - configurado para aceitar certificados em producao
         builder.Services.AddHttpClient("AegisApi", client =>
         {
             client.BaseAddress = new Uri(apiUrl);
             client.DefaultRequestHeaders.Add("Accept", "application/json");
+        })
+        .ConfigurePrimaryHttpMessageHandler(() =>
+        {
+            var handler = new HttpClientHandler();
+            // Em producao, aceita certificados da Railway
+            if (!builder.Environment.IsDevelopment())
+            {
+                handler.ServerCertificateCustomValidationCallback = 
+                    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+            }
+            return handler;
         });
         
         // Registra a URL da API para uso nas Views
@@ -53,6 +64,12 @@ public class Program
         // Services
         builder.Services.AddScoped<IApiService, ApiService>();
         
+        // Configura response encoding para UTF-8
+        builder.Services.AddResponseCompression();
+        builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
+        {
+            options.ValueLengthLimit = int.MaxValue;
+        });
         
         var app = builder.Build();
 
@@ -63,6 +80,13 @@ public class Program
             app.UseExceptionHandler("/Home/Error");
             // Nao usa HSTS nem HttpsRedirection - Railway ja cuida do SSL
         }
+
+        // Adiciona header de charset UTF-8
+        app.Use(async (context, next) =>
+        {
+            context.Response.Headers.Append("Content-Type", "text/html; charset=utf-8");
+            await next();
+        });
 
         app.UseRouting();
         
@@ -75,6 +99,7 @@ public class Program
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}")
             .WithStaticAssets();
+
 
         app.Run();
     }

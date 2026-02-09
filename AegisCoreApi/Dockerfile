@@ -3,6 +3,10 @@ FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
 EXPOSE 80
 
+# Define locale para UTF-8
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
