@@ -5,6 +5,7 @@ using AegisCoreApi.Data;
 using AegisCoreApi.Middleware;
 using AegisCoreApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -19,6 +20,11 @@ public class Program
         
         Console.WriteLine($"[CONFIG] Environment: {builder.Environment.EnvironmentName}");
         
+        // Configura para usar a porta do Railway
+        var port = Environment.GetEnvironmentVariable("PORT") ?? "5050";
+        builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+        Console.WriteLine($"[CONFIG] Listening on port: {port}");
+        
         // ========== Configuration ==========
         ConfigureServices(builder);
         
@@ -32,6 +38,7 @@ public class Program
         
         await app.RunAsync();
     }
+    
     
     private static void ConfigureServices(WebApplicationBuilder builder)
     {
@@ -147,13 +154,18 @@ public class Program
         services.AddScoped<IRequestLogService, RequestLogService>();
         services.AddScoped<ApiKeyAuthFilter>();
         
-        // CORS
+        // CORS - aceita qualquer origem em producao para facilitar
+        var corsOrigins = Environment.GetEnvironmentVariable("CORS_ORIGINS")
+            ?? configuration["Cors:Origins"]
+            ?? "http://localhost:5100";
+        
+        Console.WriteLine($"[CONFIG] CORS Origins: {corsOrigins}");
+        
         services.AddCors(options =>
         {
             options.AddPolicy("AllowFrontend", policy =>
             {
-                policy.WithOrigins(
-                        configuration["Cors:Origins"]?.Split(',') ?? new[] { "http://localhost:5000", "https://localhost:5001" })
+                policy.WithOrigins(corsOrigins.Split(','))
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
@@ -163,6 +175,12 @@ public class Program
     
     private static void ConfigureMiddleware(WebApplication app)
     {
+        // IMPORTANTE: ForwardedHeaders PRIMEIRO - necessario para Railway/proxies
+        app.UseForwardedHeaders(new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+        });
+        
         // Swagger (always enabled for SaaS)
         app.UseSwagger();
         app.UseSwaggerUI(c =>
@@ -172,9 +190,10 @@ public class Program
             c.DocumentTitle = "AegisCore API Documentation";
         });
         
-        // Não usa HttpsRedirection - Railway já cuida do SSL no proxy
+        // NAO usa HttpsRedirection - Railway ja cuida do SSL no proxy
         
         app.UseCors("AllowFrontend");
+        
         
         app.UseAuthentication();
         app.UseAuthorization();

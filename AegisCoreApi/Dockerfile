@@ -6,6 +6,7 @@ EXPOSE 80
 # Define locale para UTF-8
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
+ENV ASPNETCORE_ENVIRONMENT=Production
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
@@ -25,9 +26,5 @@ RUN dotnet publish "AegisCoreApi.csproj" -c Release -o /app/publish /p:UseAppHos
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-
-# Railway usa a variável PORT
-ENV ASPNETCORE_URLS=http://+:${PORT:-80}
-ENV ASPNETCORE_ENVIRONMENT=Production
 
 ENTRYPOINT ["dotnet", "AegisCoreApi.dll"]

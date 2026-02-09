@@ -1,5 +1,6 @@
 using AegisCoreWeb.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace AegisCoreWeb;
 
@@ -8,6 +9,11 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        
+        // Configura para usar a porta do Railway
+        var port = Environment.GetEnvironmentVariable("PORT") ?? "5100";
+        builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+        Console.WriteLine($"[CONFIG] Listening on port: {port}");
         
         // Determina a URL da API (prioridade: variável de ambiente > appsettings)
         var apiUrl = Environment.GetEnvironmentVariable("API_URL")
@@ -64,29 +70,21 @@ public class Program
         // Services
         builder.Services.AddScoped<IApiService, ApiService>();
         
-        // Configura response encoding para UTF-8
-        builder.Services.AddResponseCompression();
-        builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
-        {
-            options.ValueLengthLimit = int.MaxValue;
-        });
-        
         var app = builder.Build();
 
+
+        // IMPORTANTE: ForwardedHeaders PRIMEIRO - necessario para Railway/proxies
+        app.UseForwardedHeaders(new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+        });
 
         // Configure the HTTP request pipeline
         if (!app.Environment.IsDevelopment())
         {
             app.UseExceptionHandler("/Home/Error");
-            // Nao usa HSTS nem HttpsRedirection - Railway ja cuida do SSL
+            // NAO usa HSTS nem HttpsRedirection - Railway ja cuida do SSL
         }
-
-        // Adiciona header de charset UTF-8
-        app.Use(async (context, next) =>
-        {
-            context.Response.Headers.Append("Content-Type", "text/html; charset=utf-8");
-            await next();
-        });
 
         app.UseRouting();
         
