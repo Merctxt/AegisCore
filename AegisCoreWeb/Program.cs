@@ -53,6 +53,7 @@ public class Program
         // Services
         builder.Services.AddScoped<IApiService, ApiService>();
         
+        
         var app = builder.Build();
 
 
@@ -60,10 +61,9 @@ public class Program
         if (!app.Environment.IsDevelopment())
         {
             app.UseExceptionHandler("/Home/Error");
-            app.UseHsts();
+            // Nao usa HSTS nem HttpsRedirection - Railway ja cuida do SSL
         }
 
-        app.UseHttpsRedirection();
         app.UseRouting();
         
         app.UseSession();

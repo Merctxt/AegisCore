@@ -172,7 +172,7 @@ public class Program
             c.DocumentTitle = "AegisCore API Documentation";
         });
         
-        app.UseHttpsRedirection();
+        // Não usa HttpsRedirection - Railway já cuida do SSL no proxy
         
         app.UseCors("AllowFrontend");
         
