@@ -1,7 +1,7 @@
 @inject AegisCoreWeb.AppSettings AppSettings
 @{
-    ViewData["Title"] = "Documentação";
-    var apiUrl = AppSettings.ApiUrl;
+    ViewData["Title"] = "Documentacao";
+    var apiUrl = AppSettings.ApiUrl?.TrimEnd('/') ?? "http://localhost:5050";
 }
 
 <div class="container py-5">
@@ -9,18 +9,18 @@
         <!-- Sidebar -->
         <div class="col-lg-3 mb-4">
             <div class="sticky-top" style="top: 80px;">
-                <h6 class="text-muted mb-3">DOCUMENTAÇÃO</h6>
+                <h6 class="text-muted mb-3">DOCUMENTACAO</h6>
                 <nav class="nav flex-column">
-                    <a class="nav-link active" href="#intro">Introdução</a>
-                    <a class="nav-link" href="#auth">Autenticação</a>
+                    <a class="nav-link active" href="#intro">Introducao</a>
+                    <a class="nav-link" href="#auth">Autenticacao</a>
                     <a class="nav-link" href="#endpoints">Endpoints</a>
-                    <a class="nav-link" href="#moderation">Moderação</a>
+                    <a class="nav-link" href="#moderation">Moderacao</a>
                     <a class="nav-link" href="#webhooks">Webhooks</a>
-                    <a class="nav-link" href="#errors">Códigos de Erro</a>
+                    <a class="nav-link" href="#errors">Codigos de Erro</a>
                     <a class="nav-link" href="#examples">Exemplos</a>
                 </nav>
                 <hr>
-                <a href="@apiUrl/swagger" target="_blank" class="btn btn-primary w-100">
+                <a href="@(apiUrl)/swagger" target="_blank" class="btn btn-primary w-100">
                     <i class="bi bi-code-slash me-2"></i>Abrir Swagger
                 </a>
             </div>
@@ -30,10 +30,10 @@
         <div class="col-lg-9">
             <!-- Intro -->
             <section id="intro" class="mb-5">
-                <h1 class="fw-bold">Documentação da API</h1>
+                <h1 class="fw-bold">Documentacao da API</h1>
                 <p class="lead">
-                    A API AegisCore permite analisar textos para detectar conteúdo tóxico usando 
-                    Inteligência Artificial da Google Perspective API.
+                    A API AegisCore permite analisar textos para detectar conteudo toxico usando 
+                    Inteligencia Artificial da Google Perspective API.
                 </p>
                 
                 <div class="alert alert-info">
@@ -43,21 +43,21 @@
                 
                 <div class="alert alert-warning">
                     <i class="bi bi-exclamation-triangle me-2"></i>
-                    Para usar a API de moderação, você precisa de uma <strong>API Key</strong>. 
+                    Para usar a API de moderacao, voce precisa de uma <strong>API Key</strong>. 
                     <a asp-controller="Account" asp-action="Register">Crie uma conta</a> para obter a sua.
                 </div>
             </section>
             
             <!-- Auth -->
             <section id="auth" class="mb-5">
-                <h2 class="fw-bold border-bottom pb-2">Autenticação</h2>
+                <h2 class="fw-bold border-bottom pb-2">Autenticacao</h2>
                 
-                <h4 class="mt-4">API Key (para Moderação)</h4>
-                <p>Para endpoints de moderação, envie sua API Key no header:</p>
+                <h4 class="mt-4">API Key (para Moderacao)</h4>
+                <p>Para endpoints de moderacao, envie sua API Key no header:</p>
                 <pre class="bg-dark text-light p-3 rounded"><code>X-Api-Key: aegis_sua_chave_aqui</code></pre>
                 
                 <h4 class="mt-4">JWT Token (para Dashboard)</h4>
-                <p>Para endpoints de gerenciamento, use autenticação JWT:</p>
+                <p>Para endpoints de gerenciamento, use autenticacao JWT:</p>
                 <pre class="bg-dark text-light p-3 rounded"><code>Authorization: Bearer seu_jwt_token</code></pre>
                 
                 <h5>Obter Token:</h5>
@@ -78,9 +78,9 @@ Content-Type: application/json
                     <table class="table table-hover">
                         <thead class="table-light">
                             <tr>
-                                <th>Método</th>
+                                <th>Metodo</th>
                                 <th>Endpoint</th>
-                                <th>Descrição</th>
+                                <th>Descricao</th>
                                 <th>Auth</th>
                             </tr>
                         </thead>
@@ -106,7 +106,7 @@ Content-Type: application/json
                             <tr>
                                 <td><span class="badge bg-success">POST</span></td>
                                 <td><code>/api/moderation/analyze/batch</code></td>
-                                <td>Análise em lote</td>
+                                <td>Analise em lote</td>
                                 <td>API Key</td>
                             </tr>
                             <tr>
@@ -118,7 +118,7 @@ Content-Type: application/json
                             <tr>
                                 <td><span class="badge bg-primary">GET</span></td>
                                 <td><code>/api/user/stats</code></td>
-                                <td>Estatísticas de uso</td>
+                                <td>Estatisticas de uso</td>
                                 <td>JWT</td>
                             </tr>
                             <tr>
@@ -134,7 +134,7 @@ Content-Type: application/json
             
             <!-- Moderation -->
             <section id="moderation" class="mb-5">
-                <h2 class="fw-bold border-bottom pb-2">Moderação de Texto</h2>
+                <h2 class="fw-bold border-bottom pb-2">Moderacao de Texto</h2>
                 
                 <h4 class="mt-4">Analisar Texto</h4>
                 <pre class="bg-dark text-light p-3 rounded"><code>POST /api/moderation/analyze
@@ -144,26 +144,28 @@ Content-Type: application/json
 {
   "text": "Texto para analisar",
   "language": "pt",
-  "includeAllScores": false
+  "includeAllScores": false,
+  "toxicityThreshold": 0.5
 }</code></pre>
                 
                 <h5 class="mt-3">Resposta:</h5>
                 <pre class="bg-dark text-light p-3 rounded"><code>{
   "isToxic": false,
   "toxicityScore": 0.12,
+  "thresholdUsed": 0.5,
   "allScores": null,
   "analyzedText": "Texto para analisar",
   "timestamp": "2025-01-15T10:30:00Z"
 }</code></pre>
                 
-                <h5 class="mt-3">Parâmetros:</h5>
+                <h5 class="mt-3">Parametros:</h5>
                 <table class="table">
                     <thead>
                         <tr>
                             <th>Campo</th>
                             <th>Tipo</th>
-                            <th>Obrigatório</th>
-                            <th>Descrição</th>
+                            <th>Obrigatorio</th>
+                            <th>Descricao</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -171,19 +173,25 @@ Content-Type: application/json
                             <td><code>text</code></td>
                             <td>string</td>
                             <td>Sim</td>
-                            <td>Texto para análise</td>
+                            <td>Texto para analise</td>
                         </tr>
                         <tr>
                             <td><code>language</code></td>
                             <td>string</td>
-                            <td>Não</td>
-                            <td>Código do idioma (pt, en, es). Padrão: pt</td>
+                            <td>Nao</td>
+                            <td>Codigo do idioma (pt, en, es). Padrao: pt</td>
                         </tr>
                         <tr>
                             <td><code>includeAllScores</code></td>
                             <td>boolean</td>
-                            <td>Não</td>
-                            <td>Incluir scores detalhados (toxicidade, insulto, etc)</td>
+                            <td>Nao</td>
+                            <td>Incluir scores detalhados</td>
+                        </tr>
+                        <tr>
+                            <td><code>toxicityThreshold</code></td>
+                            <td>double</td>
+                            <td>Nao</td>
+                            <td>Limite para considerar toxico (0.0 a 1.0). Padrao: 0.5</td>
                         </tr>
                     </tbody>
                 </table>
@@ -193,17 +201,16 @@ Content-Type: application/json
                 <ul>
                     <li><strong>TOXICITY</strong> - Toxicidade geral</li>
                     <li><strong>SEVERE_TOXICITY</strong> - Toxicidade severa</li>
-                    <li><strong>IDENTITY_ATTACK</strong> - Ataque a identidade</li>
                     <li><strong>INSULT</strong> - Insultos</li>
-                    <li><strong>PROFANITY</strong> - Palavrões</li>
-                    <li><strong>THREAT</strong> - Ameaças</li>
+                    <li><strong>PROFANITY</strong> - Palavroes</li>
                 </ul>
+                <p class="text-muted"><small>Nota: IDENTITY_ATTACK e THREAT so estao disponiveis para ingles.</small></p>
             </section>
             
             <!-- Webhooks -->
             <section id="webhooks" class="mb-5">
                 <h2 class="fw-bold border-bottom pb-2">Webhooks</h2>
-                <p>Receba notificações em tempo real quando conteúdo tóxico for detectado.</p>
+                <p>Receba notificacoes em tempo real quando conteudo toxico for detectado.</p>
                 
                 <h4 class="mt-4">Criar Webhook</h4>
                 <pre class="bg-dark text-light p-3 rounded"><code>POST /api/webhooks
@@ -219,62 +226,45 @@ Content-Type: application/json
                 
                 <h5 class="mt-3">Tipos de Eventos:</h5>
                 <ul>
-                    <li><code>1</code> - Conteúdo Tóxico</li>
+                    <li><code>1</code> - Conteudo Toxico</li>
                     <li><code>2</code> - Alta Toxicidade (&gt;90%)</li>
                     <li><code>4</code> - Rate Limit Atingido</li>
                     <li><code>7</code> - Todos os Eventos</li>
                 </ul>
-                
-                <h5 class="mt-3">Payload Recebido:</h5>
-                <pre class="bg-dark text-light p-3 rounded"><code>{
-  "event": "ToxicContent",
-  "timestamp": "2025-01-15T10:30:00Z",
-  "data": {
-    "text": "texto analisado",
-    "toxicityScore": 0.85,
-    "analyzedAt": "2025-01-15T10:30:00Z"
-  }
-}</code></pre>
-                
-                <div class="alert alert-info mt-3">
-                    <i class="bi bi-shield-check me-2"></i>
-                    Se você configurar um <code>secret</code>, valide a assinatura no header 
-                    <code>X-Aegis-Signature</code> (formato: <code>sha256=hash</code>)
-                </div>
             </section>
             
             <!-- Errors -->
             <section id="errors" class="mb-5">
-                <h2 class="fw-bold border-bottom pb-2">Códigos de Erro</h2>
+                <h2 class="fw-bold border-bottom pb-2">Codigos de Erro</h2>
                 
                 <table class="table">
                     <thead class="table-light">
                         <tr>
-                            <th>Código</th>
+                            <th>Codigo</th>
                             <th>Significado</th>
-                            <th>Descrição</th>
+                            <th>Descricao</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td><code>200</code></td>
                             <td>OK</td>
-                            <td>Requisição bem-sucedida</td>
+                            <td>Requisicao bem-sucedida</td>
                         </tr>
                         <tr>
                             <td><code>400</code></td>
                             <td>Bad Request</td>
-                            <td>Dados inválidos na requisição</td>
+                            <td>Dados invalidos na requisicao</td>
                         </tr>
                         <tr>
                             <td><code>401</code></td>
                             <td>Unauthorized</td>
-                            <td>API Key inválida ou não fornecida</td>
+                            <td>API Key invalida ou nao fornecida</td>
                         </tr>
                         <tr>
                             <td><code>429</code></td>
                             <td>Too Many Requests</td>
-                            <td>Limite de requisições excedido</td>
+                            <td>Limite de requisicoes excedido</td>
                         </tr>
                         <tr>
                             <td><code>500</code></td>
@@ -287,7 +277,7 @@ Content-Type: application/json
             
             <!-- Examples -->
             <section id="examples" class="mb-5">
-                <h2 class="fw-bold border-bottom pb-2">Exemplos de Código</h2>
+                <h2 class="fw-bold border-bottom pb-2">Exemplos de Codigo</h2>
                 
                 <ul class="nav nav-tabs" id="exampleTabs" role="tablist">
                     <li class="nav-item" role="presentation">
@@ -303,19 +293,21 @@ Content-Type: application/json
                         <button class="nav-link" id="python-tab" data-bs-toggle="tab" data-bs-target="#python" type="button">Python</button>
                     </li>
                 </ul>
-                <div class="tab-content border border-top-0 p-3 rounded-bottom" id="exampleTabsContent">
+                
+                <div class="tab-content mt-3" id="exampleTabsContent">
                     <div class="tab-pane fade show active" id="curl" role="tabpanel">
-                        <pre class="bg-dark text-light p-3 rounded mb-0"><code>curl -X POST @(apiUrl)/api/moderation/analyze \
-  -H "X-Api-Key: aegis_sua_chave" \
+                        <pre class="bg-dark text-light p-3 rounded"><code>curl -X POST "@(apiUrl)/api/moderation/analyze" \
   -H "Content-Type: application/json" \
-  -d '{"text": "Olá, mundo!", "language": "pt"}'</code></pre>
+  -H "X-Api-Key: aegis_sua_chave" \
+  -d '{"text": "Texto para analisar", "language": "pt"}'</code></pre>
                     </div>
+                    
                     <div class="tab-pane fade" id="js" role="tabpanel">
-                        <pre class="bg-dark text-light p-3 rounded mb-0"><code>const response = await fetch('@(apiUrl)/api/moderation/analyze', {
+                        <pre class="bg-dark text-light p-3 rounded"><code>const response = await fetch('@(apiUrl)/api/moderation/analyze', {
   method: 'POST',
   headers: {
-    'X-Api-Key': 'aegis_sua_chave',
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'X-Api-Key': 'aegis_sua_chave'
   },
   body: JSON.stringify({
     text: 'Texto para analisar',
@@ -323,11 +315,12 @@ Content-Type: application/json
   })
 });
 
-const result = await response.json();
-console.log(result.isToxic, result.toxicityScore);</code></pre>
+const data = await response.json();
+console.log(data.isToxic, data.toxicityScore);</code></pre>
                     </div>
+                    
                     <div class="tab-pane fade" id="csharp" role="tabpanel">
-                        <pre class="bg-dark text-light p-3 rounded mb-0"><code>using var client = new HttpClient();
+                        <pre class="bg-dark text-light p-3 rounded"><code>using var client = new HttpClient();
 client.DefaultRequestHeaders.Add("X-Api-Key", "aegis_sua_chave");
 
 var response = await client.PostAsJsonAsync(
@@ -335,10 +328,12 @@ var response = await client.PostAsJsonAsync(
     new { text = "Texto para analisar", language = "pt" }
 );
 
-var result = await response.Content.ReadFromJsonAsync&lt;ModerationResponse&gt;();</code></pre>
+var result = await response.Content.ReadFromJsonAsync&lt;ModerationResponse&gt;();
+Console.WriteLine($"Toxico: {result.IsToxic}, Score: {result.ToxicityScore}");</code></pre>
                     </div>
+                    
                     <div class="tab-pane fade" id="python" role="tabpanel">
-                        <pre class="bg-dark text-light p-3 rounded mb-0"><code>import requests
+                        <pre class="bg-dark text-light p-3 rounded"><code>import requests
 
 response = requests.post(
     '@(apiUrl)/api/moderation/analyze',
@@ -346,21 +341,8 @@ response = requests.post(
     json={'text': 'Texto para analisar', 'language': 'pt'}
 )
 
-result = response.json()
-print(f"Tóxico: {result['isToxic']}, Score: {result['toxicityScore']}")</code></pre>
-                    </div>
-                </div>
-            </section>
-            
-            <!-- Self-hosted -->
-            <section class="mb-5">
-                <div class="card bg-light border-0">
-                    <div class="card-body">
-                        <h4><i class="bi bi-github me-2"></i>Self-Hosted</h4>
-                        <p>Quer hospedar sua própria instância? O código é open-source!</p>
-                        <a href="https://github.com/Merctxt/AegisCore" target="_blank" class="btn btn-dark">
-                            <i class="bi bi-github me-2"></i>Ver no GitHub
-                        </a>
+data = response.json()
+print(f"Toxico: {data['isToxic']}, Score: {data['toxicityScore']}")</code></pre>
                     </div>
                 </div>
             </section>
@@ -381,3 +363,4 @@ print(f"Tóxico: {result['isToxic']}, Score: {result['toxicityScore']}")</code></
         });
     </script>
 }
+
