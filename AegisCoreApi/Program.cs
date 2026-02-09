@@ -151,25 +151,33 @@ public class Program
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IApiKeyService, ApiKeyService>();
         services.AddScoped<IPerspectiveService, PerspectiveService>();
-        services.AddScoped<IWebhookService, WebhookService>();
         services.AddScoped<IRequestLogService, RequestLogService>();
         services.AddScoped<ApiKeyAuthFilter>();
         
-        // CORS - aceita qualquer origem em producao para facilitar
+        // CORS
         var corsOrigins = Environment.GetEnvironmentVariable("CORS_ORIGINS")
             ?? configuration["Cors:Origins"]
-            ?? "http://localhost:5100";
+            ?? "*";
         
         Console.WriteLine($"[CONFIG] CORS Origins: {corsOrigins}");
         
         services.AddCors(options =>
         {
-            options.AddPolicy("AllowFrontend", policy =>
+            options.AddPolicy("AllowAll", policy =>
             {
-                policy.WithOrigins(corsOrigins.Split(','))
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowCredentials();
+                if (corsOrigins == "*")
+                {
+                    policy.AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                }
+                else
+                {
+                    policy.WithOrigins(corsOrigins.Split(','))
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                }
             });
         });
     }
@@ -193,7 +201,7 @@ public class Program
         
         // NAO usa HttpsRedirection - Railway ja cuida do SSL no proxy
         
-        app.UseCors("AllowFrontend");
+        app.UseCors("AllowAll");
         
         
         app.UseAuthentication();

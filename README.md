@@ -48,4 +48,3 @@ Documentação completa disponível em [Docs/README.md](Docs/README.md):
 2. Crie um novo projeto ou selecione um existente
 3. Ative a **Perspective Comment Analyzer API**
 4. Crie uma credencial de API Key
-

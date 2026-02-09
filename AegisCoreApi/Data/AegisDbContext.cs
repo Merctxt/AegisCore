@@ -12,7 +12,6 @@ public class AegisDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
     public DbSet<RequestLog> RequestLogs => Set<RequestLog>();
-    public DbSet<Webhook> Webhooks => Set<Webhook>();
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -52,18 +51,6 @@ public class AegisDbContext : DbContext
             entity.HasOne(r => r.User)
                 .WithMany(u => u.RequestLogs)
                 .HasForeignKey(r => r.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-        });
-        
-        // Webhook configuration
-        modelBuilder.Entity<Webhook>(entity =>
-        {
-            entity.HasIndex(w => w.UserId);
-            entity.Property(w => w.Events).HasConversion<int>();
-            
-            entity.HasOne(w => w.User)
-                .WithMany(u => u.Webhooks)
-                .HasForeignKey(w => w.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
     }

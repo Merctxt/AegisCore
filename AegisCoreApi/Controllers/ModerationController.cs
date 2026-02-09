@@ -15,20 +15,17 @@ public class ModerationController : ControllerBase
     private readonly IPerspectiveService _perspectiveService;
     private readonly IApiKeyService _apiKeyService;
     private readonly IRequestLogService _logService;
-    private readonly IWebhookService _webhookService;
     private readonly ILogger<ModerationController> _logger;
     
     public ModerationController(
         IPerspectiveService perspectiveService,
         IApiKeyService apiKeyService,
         IRequestLogService logService,
-        IWebhookService webhookService,
         ILogger<ModerationController> logger)
     {
         _perspectiveService = perspectiveService;
         _apiKeyService = apiKeyService;
         _logService = logService;
-        _webhookService = webhookService;
         _logger = logger;
     }
     
@@ -64,13 +61,6 @@ public class ModerationController : ControllerBase
         // Check rate limit
         if (!await _apiKeyService.CheckRateLimitAsync(apiKey, user))
         {
-            // Trigger rate limit webhook
-            await _webhookService.TriggerWebhooksAsync(user.Id, WebhookEventType.RateLimitReached, new
-            {
-                apiKeyId = apiKey.Id,
-                apiKeyName = apiKey.Name
-            });
-            
             return StatusCode(429, new { error = "Daily rate limit exceeded", limit = GetDailyLimit(user.Plan) });
         }
         
@@ -99,21 +89,6 @@ public class ModerationController : ControllerBase
         
         // Increment usage
         await _apiKeyService.IncrementUsageAsync(apiKey.Id);
-        
-        // Trigger webhook if toxic
-        if (result.IsToxic)
-        {
-            var eventType = result.ToxicityScore >= 0.9 
-                ? WebhookEventType.HighToxicity 
-                : WebhookEventType.ToxicContent;
-                
-            await _webhookService.TriggerWebhooksAsync(user.Id, eventType, new
-            {
-                text = request.Text,
-                toxicityScore = result.ToxicityScore,
-                analyzedAt = result.Timestamp
-            });
-        }
         
         return Ok(result);
     }
@@ -145,7 +120,6 @@ public class ModerationController : ControllerBase
         {
             return Unauthorized(new { error = "Invalid API Key" });
         }
-        
         
         var result = await _perspectiveService.AnalyzeBatchAsync(
             request.Texts, 

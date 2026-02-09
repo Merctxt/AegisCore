@@ -30,7 +30,6 @@ public class User
     // Navigation properties
     public ICollection<ApiKey> ApiKeys { get; set; } = new List<ApiKey>();
     public ICollection<RequestLog> RequestLogs { get; set; } = new List<RequestLog>();
-    public ICollection<Webhook> Webhooks { get; set; } = new List<Webhook>();
 }
 
 public enum PlanType
