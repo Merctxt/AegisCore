@@ -216,14 +216,33 @@ public class Program
         
         try
         {
-            logger.LogInformation("Applying database migrations...");
-            await context.Database.MigrateAsync();
-            logger.LogInformation("Database migrations applied successfully");
+            // Verifica se o banco existe e cria as tabelas se necessario
+            logger.LogInformation("Checking database connection...");
+            
+            // Primeiro tenta criar o banco/tabelas se nao existirem
+            var created = await context.Database.EnsureCreatedAsync();
+            if (created)
+            {
+                logger.LogInformation("Database created successfully");
+            }
+            else
+            {
+                logger.LogInformation("Database already exists");
+            }
+            
+            // Se houver migrations pendentes, aplica
+            var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
+            if (pendingMigrations.Any())
+            {
+                logger.LogInformation("Applying {Count} pending migrations...", pendingMigrations.Count());
+                await context.Database.MigrateAsync();
+                logger.LogInformation("Migrations applied successfully");
+            }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error applying database migrations. Attempting to create database...");
-            await context.Database.EnsureCreatedAsync();
+            logger.LogError(ex, "Error initializing database");
+            throw; // Deixa o erro aparecer para debug
         }
     }
     
