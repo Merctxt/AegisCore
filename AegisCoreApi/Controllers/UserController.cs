@@ -150,14 +150,12 @@ public class UserController : ControllerBase
         
         var user = await _context.Users
             .Include(u => u.ApiKeys)
-            .Include(u => u.Webhooks)
             .FirstOrDefaultAsync(u => u.Id == userId.Value);
             
         if (user == null) return NotFound();
         
         // Delete all associated data
         _context.ApiKeys.RemoveRange(user.ApiKeys);
-        _context.Webhooks.RemoveRange(user.Webhooks);
         
         // Delete request logs
         var logs = await _context.RequestLogs.Where(l => l.UserId == userId.Value).ToListAsync();
