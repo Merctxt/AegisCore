@@ -23,11 +23,6 @@ AegisCore/
 │   ├── DTOs/              # Data Transfer Objects
 │   ├── Data/              # DbContext (PostgreSQL)
 │   └── Middleware/        # Autenticação API Key
-├── AegisCoreWeb/          # Frontend (ASP.NET MVC)
-│   ├── Controllers/       # Controllers MVC
-│   ├── Views/             # Razor Views
-│   ├── Models/            # ViewModels
-│   └── Services/          # Serviços HTTP
 └── Docs/                  # Documentação
 ```
 

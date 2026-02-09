@@ -2,6 +2,8 @@
 
 Sistema completo de moderação automática de conteúdo utilizando Google Perspective API, construído com ASP.NET Core.
 
+### Api disponível aqui: [https://api.giovannidev.com/swagger](https://api.giovannidev.com/swagger/index.html)
+
 ## Funcionalidades
 
 ### API REST (AegisCoreApi)
@@ -46,5 +48,4 @@ Documentação completa disponível em [Docs/README.md](Docs/README.md):
 2. Crie um novo projeto ou selecione um existente
 3. Ative a **Perspective Comment Analyzer API**
 4. Crie uma credencial de API Key
-5. Copie a chave para o `.env`
 
