@@ -1,5 +1,6 @@
 using AegisCoreWeb.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 
 namespace AegisCoreWeb;
@@ -15,13 +16,21 @@ public class Program
         builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
         Console.WriteLine($"[CONFIG] Listening on port: {port}");
         
-        // Determina a URL da API (prioridade: variável de ambiente > appsettings)
+        // Determina a URL da API (prioridade: variavel de ambiente > appsettings)
         var apiUrl = Environment.GetEnvironmentVariable("API_URL")
             ?? builder.Configuration["Urls:Api"] 
             ?? "http://localhost:5050";
         
         Console.WriteLine($"[CONFIG] Environment: {builder.Environment.EnvironmentName}");
         Console.WriteLine($"[CONFIG] API URL: {apiUrl}");
+        
+        // DataProtection - persiste chaves para containers
+        var dataProtectionPath = Path.Combine(builder.Environment.ContentRootPath, "keys");
+        Directory.CreateDirectory(dataProtectionPath);
+        
+        builder.Services.AddDataProtection()
+            .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath))
+            .SetApplicationName("AegisCoreWeb");
         
         // Add services to the container
         builder.Services.AddControllersWithViews();
@@ -34,6 +43,7 @@ public class Program
             options.IdleTimeout = TimeSpan.FromHours(24);
             options.Cookie.HttpOnly = true;
             options.Cookie.IsEssential = true;
+            options.Cookie.SameSite = SameSiteMode.Lax;
         });
         
         // Cookie Authentication
@@ -44,6 +54,7 @@ public class Program
                 options.LogoutPath = "/Account/Logout";
                 options.ExpireTimeSpan = TimeSpan.FromDays(7);
                 options.SlidingExpiration = true;
+                options.Cookie.SameSite = SameSiteMode.Lax;
             });
         
         // HTTP Client for API - configurado para aceitar certificados em producao
@@ -71,6 +82,8 @@ public class Program
         builder.Services.AddScoped<IApiService, ApiService>();
         
         var app = builder.Build();
+
+
 
 
         // IMPORTANTE: ForwardedHeaders PRIMEIRO - necessario para Railway/proxies

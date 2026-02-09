@@ -1,11 +1,11 @@
 @{
-    ViewData["Title"] = "Planos e Preços";
+    ViewData["Title"] = "Planos e Precos";
 }
 
 <div class="container py-5">
     <div class="text-center mb-5">
-        <h1 class="fw-bold">Planos e Preços</h1>
-        <p class="lead text-muted">Escolha o plano ideal para sua aplicação</p>
+        <h1 class="fw-bold">Planos e Precos</h1>
+        <p class="lead text-muted">Escolha o plano ideal para sua aplicacao</p>
     </div>
     
     <div class="row g-4 justify-content-center">
@@ -16,19 +16,19 @@
                     <h5 class="text-muted">Free</h5>
                     <div class="my-4">
                         <span class="display-5 fw-bold">R$0</span>
-                        <span class="text-muted">/mês</span>
+                        <span class="text-muted">/mes</span>
                     </div>
                     <p class="text-muted">Perfeito para testes e projetos pequenos.</p>
                     <ul class="list-unstyled mb-4">
-                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>100 requisições/dia</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>100 requisicoes/dia</li>
                         <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>5 API Keys</li>
-                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Detecção básica</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Deteccao basica</li>
                         <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Suporte comunidade</li>
                         <li class="mb-2 text-muted"><i class="bi bi-x-circle me-2"></i>Webhooks</li>
-                        <li class="mb-2 text-muted"><i class="bi bi-x-circle me-2"></i>Análise em lote</li>
+                        <li class="mb-2 text-muted"><i class="bi bi-x-circle me-2"></i>Analise em lote</li>
                     </ul>
                     <a asp-controller="Account" asp-action="Register" class="btn btn-outline-primary w-100">
-                        Começar Grátis
+                        Comecar Gratis
                     </a>
                 </div>
             </div>
@@ -41,47 +41,45 @@
                     <h5 class="text-muted">Starter</h5>
                     <div class="my-4">
                         <span class="display-5 fw-bold">R$49</span>
-                        <span class="text-muted">/mês</span>
+                        <span class="text-muted">/mes</span>
                     </div>
-                    <p class="text-muted">Ótimo para aplicações em crescimento.</p>
+                    <p class="text-muted">Otimo para aplicacoes em crescimento.</p>
                     <ul class="list-unstyled mb-4">
-                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>1.000 requisições/dia</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>1.000 requisicoes/dia</li>
                         <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>10 API Keys</li>
-                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Análise completa</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Analise completa</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Suporte email</li>
                         <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Webhooks</li>
-                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Suporte por email</li>
-                        <li class="mb-2 text-muted"><i class="bi bi-x-circle me-2"></i>Análise em lote</li>
+                        <li class="mb-2 text-muted"><i class="bi bi-x-circle me-2"></i>Analise em lote</li>
                     </ul>
-                    <a href="#" class="btn btn-outline-primary w-100">
-                        Escolher Starter
+                    <a asp-controller="Account" asp-action="Register" class="btn btn-primary w-100">
+                        Assinar Starter
                     </a>
                 </div>
             </div>
         </div>
         
-        <!-- Pro (Popular) -->
+        <!-- Pro -->
         <div class="col-lg-3 col-md-6">
             <div class="card h-100 border-primary border-2 position-relative">
-                <div class="position-absolute top-0 start-50 translate-middle">
-                    <span class="badge bg-primary px-3 py-2">Mais Popular</span>
-                </div>
-                <div class="card-body p-4 pt-5">
+                <span class="badge bg-primary position-absolute top-0 start-50 translate-middle">Popular</span>
+                <div class="card-body p-4">
                     <h5 class="text-primary">Pro</h5>
                     <div class="my-4">
-                        <span class="display-5 fw-bold">R$199</span>
-                        <span class="text-muted">/mês</span>
+                        <span class="display-5 fw-bold">R$149</span>
+                        <span class="text-muted">/mes</span>
                     </div>
-                    <p class="text-muted">Para aplicações profissionais.</p>
+                    <p class="text-muted">Para aplicacoes de alto volume.</p>
                     <ul class="list-unstyled mb-4">
-                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>10.000 requisições/dia</li>
-                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>10 API Keys</li>
-                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Análise completa</li>
-                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Webhooks ilimitados</li>
-                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Análise em lote</li>
-                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Suporte prioritário</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>10.000 requisicoes/dia</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>50 API Keys</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Analise completa</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Suporte prioritario</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Webhooks</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Analise em lote</li>
                     </ul>
-                    <a href="#" class="btn btn-primary w-100">
-                        Escolher Pro
+                    <a asp-controller="Account" asp-action="Register" class="btn btn-primary w-100">
+                        Assinar Pro
                     </a>
                 </div>
             </div>
@@ -89,23 +87,23 @@
         
         <!-- Enterprise -->
         <div class="col-lg-3 col-md-6">
-            <div class="card h-100 border bg-dark text-white">
+            <div class="card h-100 border">
                 <div class="card-body p-4">
-                    <h5 class="text-light">Enterprise</h5>
+                    <h5 class="text-muted">Enterprise</h5>
                     <div class="my-4">
                         <span class="display-5 fw-bold">Custom</span>
                     </div>
-                    <p class="text-light opacity-75">Soluções sob medida para grandes organizações.</p>
+                    <p class="text-muted">Solucoes personalizadas para grandes empresas.</p>
                     <ul class="list-unstyled mb-4">
-                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Requisições ilimitadas</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Requisicoes ilimitadas</li>
                         <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>API Keys ilimitadas</li>
-                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>SLA garantido</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>SLA 99.9%</li>
                         <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Suporte dedicado</li>
-                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Deploy on-premise</li>
-                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Integrações custom</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Webhooks</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Integracao customizada</li>
                     </ul>
-                    <a href="#" class="btn btn-outline-light w-100">
-                        Falar com Vendas
+                    <a href="https://github.com/Merctxt/AegisCore" target="_blank" class="btn btn-outline-primary w-100">
+                        Fale Conosco
                     </a>
                 </div>
             </div>
@@ -114,44 +112,46 @@
     
     <!-- FAQ -->
     <div class="mt-5 pt-5">
-        <h3 class="text-center fw-bold mb-4">Perguntas Frequentes</h3>
+        <h2 class="text-center fw-bold mb-5">Perguntas Frequentes</h2>
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div class="accordion" id="faqAccordion">
                     <div class="accordion-item">
                         <h2 class="accordion-header">
                             <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                Como funciona o limite de requisições?
+                                Posso mudar de plano a qualquer momento?
                             </button>
                         </h2>
                         <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
                             <div class="accordion-body">
-                                Cada requisição à API de moderação conta como uma requisição. O contador é resetado diariamente à meia-noite UTC.
+                                Sim! Voce pode fazer upgrade ou downgrade do seu plano a qualquer momento. 
+                                As alteracoes entram em vigor imediatamente.
                             </div>
                         </div>
                     </div>
                     <div class="accordion-item">
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                                Posso mudar de plano a qualquer momento?
+                                O que acontece se eu exceder meu limite diario?
                             </button>
                         </h2>
                         <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                             <div class="accordion-body">
-                                Sim! Você pode fazer upgrade ou downgrade do seu plano a qualquer momento. As mudanças entram em vigor imediatamente.
+                                Suas requisicoes serao rejeitadas com erro 429 (Too Many Requests) ate o proximo dia (00:00 UTC). 
+                                Recomendamos configurar webhooks para ser notificado antes de atingir o limite.
                             </div>
                         </div>
                     </div>
                     <div class="accordion-item">
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                                Posso hospedar a API eu mesmo?
+                                Como funciona o periodo de teste?
                             </button>
                         </h2>
                         <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                             <div class="accordion-body">
-                                Sim! O código é open-source. Você pode clonar o repositório e hospedar sua própria instância. 
-                                Veja a documentação em <a href="https://github.com/Merctxt/AegisCore">GitHub</a>.
+                                O plano Free e gratuito para sempre com 100 requisicoes diarias. 
+                                Nao ha necessidade de cartao de credito para comecar.
                             </div>
                         </div>
                     </div>

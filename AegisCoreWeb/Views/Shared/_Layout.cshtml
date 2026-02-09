@@ -1,13 +1,13 @@
 ﻿@inject AegisCoreWeb.AppSettings AppSettings
 @{
-    var apiUrl = AppSettings.ApiUrl;
+    var apiUrl = AppSettings.ApiUrl?.TrimEnd('/') ?? "http://localhost:5050";
 }
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="AegisCore - Moderação de conteúdo com IA usando Google Perspective API" />
+    <meta name="description" content="AegisCore - Moderacao de conteudo com IA usando Google Perspective API" />
     <title>@ViewData["Title"] - AegisCore</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
@@ -28,16 +28,16 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index">Início</a>
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">Inicio</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Home" asp-action="Pricing">Planos</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Documentation">Documentação</a>
+                            <a class="nav-link" asp-controller="Home" asp-action="Documentation">Documentacao</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="@apiUrl/swagger" target="_blank">API <i class="bi bi-box-arrow-up-right small"></i></a>
+                            <a class="nav-link" href="@(apiUrl)/swagger" target="_blank">API <i class="bi bi-box-arrow-up-right small"></i></a>
                         </li>
                     </ul>
                     <ul class="navbar-nav">
@@ -53,7 +53,7 @@
                                 <i class="bi bi-person-circle me-1"></i>@User.Identity.Name
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" asp-controller="Dashboard" asp-action="Settings">Configurações</a></li>
+                                <li><a class="dropdown-item" asp-controller="Dashboard" asp-action="Settings">Configuracoes</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form asp-controller="Account" asp-action="Logout" method="post">
@@ -108,7 +108,7 @@
             <div class="row">
                 <div class="col-md-4 mb-4">
                     <h5><i class="bi bi-shield-check me-2"></i>AegisCore</h5>
-                    <p class="">Moderação de conteúdo com IA para suas aplicações.</p>
+                    <p class="">Moderacao de conteudo com IA para suas aplicacoes.</p>
                     <div class="d-flex gap-3">
                         <a href="https://github.com/Merctxt/AegisCore" class="text-light" target="_blank">
                             <i class="bi bi-github fs-4"></i>
@@ -119,14 +119,14 @@
                     <h6>Produto</h6>
                     <ul class="list-unstyled">
                         <li><a href="#" class="text-decoration-none">Recursos</a></li>
-                        <li><a asp-controller="Home" asp-action="Pricing" class="text-decoration-none">Preços</a></li>
-                        <li><a href="@apiUrl/swagger" class="text-decoration-none">API</a></li>
+                        <li><a asp-controller="Home" asp-action="Pricing" class="text-decoration-none">Precos</a></li>
+                        <li><a href="@(apiUrl)/swagger" class="text-decoration-none">API</a></li>
                     </ul>
                 </div>
                 <div class="col-md-2 mb-4">
                     <h6>Recursos</h6>
                     <ul class="list-unstyled">
-                        <li><a asp-controller="Home" asp-action="Documentation" class="text-decoration-none">Documentação</a></li>
+                        <li><a asp-controller="Home" asp-action="Documentation" class="text-decoration-none">Documentacao</a></li>
                         <li><a href="https://github.com/Merctxt/AegisCore" class="text-decoration-none">GitHub</a></li>
                     </ul>
                 </div>
