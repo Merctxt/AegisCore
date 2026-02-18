@@ -11,7 +11,7 @@ Esta página documenta todos os códigos de status HTTP retornados pela AegisCor
 | Código | Nome | Descrição |
 |--------|------|-----------|
 | 200 | OK | Requisição processada com sucesso |
-| 201 | Created | Recurso criado com sucesso (ex: webhook, API key) |
+| 201 | Created | Recurso criado com sucesso (ex: API key) |
 | 204 | No Content | Requisição bem-sucedida, sem conteúdo de retorno (ex: DELETE) |
 
 ---

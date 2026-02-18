@@ -71,8 +71,6 @@ debug.log
 .Trashes
 ehthumbs.db
 Thumbs.db
-ca-certificate.crt
-certificate.pem
-private-key.key
+docker-compose.yml
 
 *Migrations*/

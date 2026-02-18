@@ -165,53 +165,6 @@ Authorization: Bearer seu_jwt_token
 
 ---
 
-## Gerenciamento de Webhooks
-
-### Listar Webhooks
-
-```http
-GET /api/webhooks
-Authorization: Bearer seu_jwt_token
-```
-
-### Criar Webhook
-
-```http
-POST /api/webhooks
-Authorization: Bearer seu_jwt_token
-Content-Type: application/json
-
-{
-  "name": "Alertas Toxicidade",
-  "url": "https://seu-servidor.com/webhook",
-  "secret": "chave_para_validacao",
-  "events": 1
-}
-```
-
-### Atualizar Webhook
-
-```http
-PUT /api/webhooks/{id}
-Authorization: Bearer seu_jwt_token
-Content-Type: application/json
-
-{
-  "name": "Novo Nome",
-  "url": "https://novo-servidor.com/webhook",
-  "events": 7
-}
-```
-
-### Deletar Webhook
-
-```http
-DELETE /api/webhooks/{id}
-Authorization: Bearer seu_jwt_token
-```
-
----
-
 ## Thresholds Personalizados
 
 Configure thresholds para cada tipo de análise:

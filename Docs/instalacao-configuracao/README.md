@@ -50,12 +50,6 @@ dotnet run --project AegisCoreApi
 
 A API estará disponível em `https://localhost:5050`
 
-## 5. Inicie o Frontend (opcional)
-
-```bash
-dotnet run --project AegisCoreWeb
-```
-
 ---
 
 ## Docker (Em breve)

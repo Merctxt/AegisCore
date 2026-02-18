@@ -1,50 +1,68 @@
-# AegisCore - API de Moderação de Conteúdo com IA
+# AegisCore - AI Content Moderation API
 
-Sistema completo de moderação automática de conteúdo utilizando Google Perspective API, construído com ASP.NET Core.
-
-### Api disponível aqui: [https://api.giovannidev.com/swagger](https://api.giovannidev.com/swagger/index.html)
-
-## Funcionalidades
-
-### API REST (AegisCoreApi)
-- **Análise de toxicidade** em tempo real via Google Perspective API
-- **Análise em lote** para processar múltiplos textos
-- **Autenticação dupla**: JWT para dashboard e API Keys para integrações
-- **Rate limiting** por plano (Free, Starter, Pro, Enterprise)
-- **Webhooks** para notificações de conteúdo tóxico
-- **Logs de requisições** para auditoria
+![.NET](https://img.shields.io/badge/.NET-9-blue)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14+-blue)
+![License](https://img.shields.io/badge/License-CC0%201.0-lightgrey)
+![Status](https://img.shields.io/badge/Status-Production--Ready-brightgreen)
 
 
-## Pré-requisitos
+
+AegisCore is a scalable content moderation API built with ASP.NET Core, powered by Google Perspective API.
+
+It provides real-time toxicity detection, plan-based rate limiting, API key authentication, and full request logging — designed for platforms that need reliable automated moderation.
+
+**Live API Documentation (Swagger):**  
+https://api.giovannidev.com/swagger
+
+## Documentation
+
+Comprehensive documentation is available in the `Docs/` directory:
+
+- [Installation & Configuration](Docs/instalacao-configuracao/README.md)
+- [Authentication](Docs/autenticacao/README.md)
+- [Rate Limiting](Docs/rate-limiting/README.md)
+- [Endpoints](Docs/endpoints/README.md)
+- [Usage Examples](Docs/exemplos-de-uso/README.md)
+- [Status Codes](Docs/codigos-de-status/README.md)
+- [Application Integration](Docs/integracao-com-aplicacoes/README.md)
+
+
+
+## Features
+
+- Real-time toxicity analysis
+- Batch text analysis
+- JWT authentication
+- API Key authentication (integrations)
+- Plan-based rate limiting (Free, Starter, Pro, Enterprise)
+- Request logging and usage tracking
+
+### Detected Content Types
+
+- Toxicity
+- Severe Toxicity
+- Identity Attacks
+- Insults
+- Profanity
+- Threats
+
+
+
+## Tech Stack
+
+- **Backend:** ASP.NET Core (.NET 9)
+- **Database:** PostgreSQL
+- **Authentication:** JWT + API Keys
+- **AI Provider:** Google Perspective API
+- **API Documentation:** Swagger / OpenAPI
+
+
+
+## Getting Started
+
+### Prerequisites
 
 - .NET 9 SDK
 - PostgreSQL 14+
 - Google Perspective API Key
 
-## Documentação
-
-Documentação completa disponível em [Docs/README.md](Docs/README.md):
-
-- [Instalação e Configuração](Docs/instalacao-configuracao/README.md)
-- [Autenticação](Docs/autenticacao/README.md)
-- [Rate Limiting](Docs/rate-limiting/README.md)
-- [Endpoints](Docs/endpoints/README.md)
-- [Exemplos de Uso](Docs/exemplos-de-uso/README.md)
-- [Códigos de Status](Docs/codigos-de-status/README.md)
-- [Integração com Aplicações](Docs/integracao-com-aplicacoes/README.md)
-
-## Tipos de Conteúdo Detectados
-
-- Toxicidade geral
-- Toxicidade severa
-- Ataques de identidade
-- Insultos
-- Profanidade
-- Ameaças
-
-## Como Obter a Google Perspective API Key
-
-1. Acesse [Google Cloud Console](https://console.cloud.google.com/)
-2. Crie um novo projeto ou selecione um existente
-3. Ative a **Perspective Comment Analyzer API**
-4. Crie uma credencial de API Key

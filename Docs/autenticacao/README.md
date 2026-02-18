@@ -6,9 +6,9 @@ A AegisCore API suporta dois métodos de autenticação: **JWT Token** e **API K
 
 ---
 
-## JWT Token (para Dashboard)
+## JWT Token (para Administração)
 
-Use JWT para acessar endpoints do dashboard e gerenciar sua conta.
+Use JWT para acessar endpoints administrativos e gerenciar sua conta.
 
 ### Login
 
@@ -54,9 +54,8 @@ Use API Keys para acessar os endpoints de moderação de conteúdo.
 
 ### Obter API Key
 
-1. Faça login no dashboard
-2. Navegue até "API Keys"
-3. Clique em "Gerar Nova Chave"
+1. Faça login via `/api/auth/login`
+2. Use o endpoint `POST /api/apikeys` para criar uma nova chave
 
 ### Uso da API Key
 
@@ -74,62 +73,9 @@ Content-Type: application/json
 
 ---
 
-## Webhooks
-
-Configure webhooks para receber notificações quando conteúdo tóxico for detectado.
-
-### Criar Webhook
-
-```http
-POST /api/webhooks
-Authorization: Bearer seu_jwt_token
-Content-Type: application/json
-
-{
-  "name": "Alertas Toxicidade",
-  "url": "https://seu-servidor.com/webhook",
-  "secret": "chave_para_validacao",
-  "events": 1
-}
-```
-
-### Eventos Disponíveis
-
-| Valor | Evento |
-|-------|--------|
-| `1` | Conteúdo Tóxico |
-| `2` | Alta Toxicidade (>90%) |
-| `4` | Rate Limit Atingido |
-| `7` | Todos os Eventos |
-
-### Payload do Webhook
-
-```json
-{
-  "event": "ToxicContent",
-  "timestamp": "2026-01-15T10:30:00Z",
-  "data": {
-    "text": "texto analisado",
-    "toxicityScore": 0.85,
-    "analyzedAt": "2026-01-15T10:30:00Z"
-  }
-}
-```
-
-### Validação de Assinatura
-
-Se você configurou um `secret`, valide a assinatura no header:
-
-```
-X-Aegis-Signature: sha256=hash_hmac_do_payload
-```
-
----
-
 ## Boas Práticas de Segurança
 
 1. **Nunca exponha** sua API Key no frontend
 2. **Rotacione** suas API Keys periodicamente
 3. **Use variáveis de ambiente** para armazenar secrets
-4. **Valide assinaturas** dos webhooks recebidos
-5. **Use HTTPS** sempre em produção
+4. **Use HTTPS** sempre em produção
