@@ -1,13 +1,8 @@
-
-
-using System.Text;
 using AegisCoreApi.Data;
 using AegisCoreApi.Middleware;
 using AegisCoreApi.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 namespace AegisCoreApi;
@@ -52,31 +47,6 @@ public class Program
         services.AddDbContext<AegisDbContext>(options =>
             options.UseNpgsql(connectionString));
         
-        // JWT Authentication (prioridade: vari�vel de ambiente > appsettings)
-        var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET")
-            ?? configuration["Jwt:Secret"] 
-            ?? throw new InvalidOperationException("JWT Secret not configured");
-        
-        Console.WriteLine($"[CONFIG] JWT Secret configured: {!string.IsNullOrEmpty(jwtSecret)}");
-        
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
-                    ValidateIssuer = true,
-                    ValidIssuer = configuration["Jwt:Issuer"] ?? "AegisCore",
-                    ValidateAudience = true,
-                    ValidAudience = configuration["Jwt:Audience"] ?? "AegisCoreUsers",
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero
-                };
-            });
-        
-        services.AddAuthorization();
-        
         // Controllers
         services.AddControllers();
         
@@ -87,8 +57,8 @@ public class Program
             c.SwaggerDoc("v1", new OpenApiInfo
             {
                 Title = "AegisCore API",
-                Version = "v1",
-                Description = "AI-powered content moderation API using Google Perspective API",
+                Version = "v2",
+                Description = "API de moderação de conteúdo usando Google Perspective API.",
                 Contact = new OpenApiContact
                 {
                     Name = "AegisCore",
@@ -96,27 +66,15 @@ public class Program
                 }
             });
             
-            // JWT Auth - usando Http scheme para adicionar Bearer automaticamente
-            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            // Access Token Auth
+            c.AddSecurityDefinition("AccessToken", new OpenApiSecurityScheme
             {
-                Description = "JWT Token. Cole apenas o token (sem 'Bearer'). Exemplo: eyJhbGciOiJIUzI1NiIs...",
-                Name = "Authorization",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.Http,
-                Scheme = "bearer",
-                BearerFormat = "JWT"
-            });
-            
-            // API Key Auth
-            c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
-            {
-                Description = "API Key para endpoints de moderacao. Exemplo: aegis_xxxxx",
-                Name = "X-Api-Key",
+                Description = "Token de acesso para API de moderação. Gere em POST /api/token/generate. Exemplo: aegis_xxxxx",
+                Name = "X-Access-Token",
                 In = ParameterLocation.Header,
                 Type = SecuritySchemeType.ApiKey
             });
             
-            // Add both security schemes - endpoints will use one or the other
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
@@ -125,18 +83,7 @@ public class Program
                         Reference = new OpenApiReference
                         {
                             Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
-                        }
-                    },
-                    Array.Empty<string>()
-                },
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "ApiKey"
+                            Id = "AccessToken"
                         }
                     },
                     Array.Empty<string>()
@@ -148,11 +95,9 @@ public class Program
         services.AddHttpClient();
         
         // Services
-        services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IApiKeyService, ApiKeyService>();
+        services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IPerspectiveService, PerspectiveService>();
-        services.AddScoped<IRequestLogService, RequestLogService>();
-        services.AddScoped<ApiKeyAuthFilter>();
+        services.AddScoped<TokenAuthFilter>();
         
         // CORS
         var corsOrigins = Environment.GetEnvironmentVariable("CORS_ORIGINS")
@@ -194,21 +139,16 @@ public class Program
         app.UseSwagger();
         app.UseSwaggerUI(c =>
         {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", "AegisCore API v1");
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "AegisCore API v2");
             c.RoutePrefix = "swagger";
-            c.DocumentTitle = "AegisCore API Documentation";
+            c.DocumentTitle = "AegisCore API - Moderação de Conteúdo";
         });
         
         // NAO usa HttpsRedirection - Railway ja cuida do SSL no proxy
         
         app.UseCors("AllowAll");
         
-        
-        app.UseAuthentication();
-        app.UseAuthorization();
-        
         app.MapControllers();
-        
         
         // Health check endpoint
         app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
@@ -256,8 +196,8 @@ public class Program
     }
     
     /// <summary>
-    /// Constr�i a connection string do PostgreSQL
-    /// Prioridade: 1) DATABASE_URL (Railway/Heroku), 2) Vari�veis separadas, 3) appsettings.json
+    /// Constr�i a connection string do PostgreSQL
+    /// Prioridade: 1) DATABASE_URL (Railway/Heroku), 2) Vari�veis separadas, 3) appsettings.json
     /// </summary>
     private static string BuildConnectionString(IConfiguration configuration)
     {
@@ -269,7 +209,7 @@ public class Program
             return ConvertPostgresUrl(databaseUrl);
         }
         
-        // 2. Tenta vari�veis de ambiente separadas
+        // 2. Tenta vari�veis de ambiente separadas
         var envHost = Environment.GetEnvironmentVariable("DB_HOST");
         if (!string.IsNullOrEmpty(envHost))
         {

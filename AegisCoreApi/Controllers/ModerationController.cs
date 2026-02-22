@@ -13,34 +13,30 @@ namespace AegisCoreApi.Controllers;
 public class ModerationController : ControllerBase
 {
     private readonly IPerspectiveService _perspectiveService;
-    private readonly IApiKeyService _apiKeyService;
-    private readonly IRequestLogService _logService;
+    private readonly ITokenService _tokenService;
     private readonly ILogger<ModerationController> _logger;
     
     public ModerationController(
         IPerspectiveService perspectiveService,
-        IApiKeyService apiKeyService,
-        IRequestLogService logService,
+        ITokenService tokenService,
         ILogger<ModerationController> logger)
     {
         _perspectiveService = perspectiveService;
-        _apiKeyService = apiKeyService;
-        _logService = logService;
+        _tokenService = tokenService;
         _logger = logger;
     }
     
     /// <summary>
-    /// Analyze text for toxic content
+    /// Analisa texto para conteúdo tóxico
     /// </summary>
     /// <remarks>
-    /// Requires API Key in header: X-Api-Key
+    /// Requer Token no header: X-Access-Token
     /// </remarks>
     [HttpPost("analyze")]
-    [ServiceFilter(typeof(ApiKeyAuthFilter))]
+    [ServiceFilter(typeof(TokenAuthFilter))]
     [ProducesResponseType(typeof(ModerationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> Analyze([FromBody] ModerationRequest request)
     {
         var stopwatch = Stopwatch.StartNew();
@@ -50,18 +46,11 @@ public class ModerationController : ControllerBase
             return BadRequest(new { error = "Text is required" });
         }
         
-        var apiKey = HttpContext.Items["ApiKey"] as ApiKey;
-        var user = HttpContext.Items["User"] as User;
+        var accessToken = HttpContext.Items["AccessToken"] as AccessToken;
         
-        if (apiKey == null || user == null)
+        if (accessToken == null)
         {
-            return Unauthorized(new { error = "Invalid API Key" });
-        }
-        
-        // Check rate limit
-        if (!await _apiKeyService.CheckRateLimitAsync(apiKey, user))
-        {
-            return StatusCode(429, new { error = "Daily rate limit exceeded", limit = GetDailyLimit(user.Plan) });
+            return Unauthorized(new { error = "Token inválido" });
         }
         
         var result = await _perspectiveService.AnalyzeTextAsync(
@@ -72,32 +61,20 @@ public class ModerationController : ControllerBase
         
         stopwatch.Stop();
         
-        // Log the request
-        await _logService.LogRequestAsync(new RequestLog
-        {
-            ApiKeyId = apiKey.Id,
-            UserId = user.Id,
-            Endpoint = "/api/moderation/analyze",
-            HttpMethod = "POST",
-            StatusCode = 200,
-            ResponseTimeMs = (int)stopwatch.ElapsedMilliseconds,
-            IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
-            UserAgent = Request.Headers.UserAgent.ToString(),
-            ToxicityScore = result.ToxicityScore,
-            IsToxic = result.IsToxic
-        });
+        // Incrementa uso do token
+        await _tokenService.IncrementUsageAsync(accessToken.Id);
         
-        // Increment usage
-        await _apiKeyService.IncrementUsageAsync(apiKey.Id);
+        _logger.LogInformation("Análise realizada em {Ms}ms - Tóxico: {IsToxic}", 
+            stopwatch.ElapsedMilliseconds, result.IsToxic);
         
         return Ok(result);
     }
     
     /// <summary>
-    /// Analyze multiple texts in batch
+    /// Analisa múltiplos textos em lote
     /// </summary>
     [HttpPost("analyze/batch")]
-    [ServiceFilter(typeof(ApiKeyAuthFilter))]
+    [ServiceFilter(typeof(TokenAuthFilter))]
     [ProducesResponseType(typeof(BatchModerationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -113,12 +90,11 @@ public class ModerationController : ControllerBase
             return BadRequest(new { error = "Maximum 100 texts per batch" });
         }
         
-        var apiKey = HttpContext.Items["ApiKey"] as ApiKey;
-        var user = HttpContext.Items["User"] as User;
+        var accessToken = HttpContext.Items["AccessToken"] as AccessToken;
         
-        if (apiKey == null || user == null)
+        if (accessToken == null)
         {
-            return Unauthorized(new { error = "Invalid API Key" });
+            return Unauthorized(new { error = "Token inválido" });
         }
         
         var result = await _perspectiveService.AnalyzeBatchAsync(
@@ -126,10 +102,10 @@ public class ModerationController : ControllerBase
             request.Language ?? "pt",
             request.ToxicityThreshold);
         
-        // Increment usage for each text
+        // Incrementa uso do token pelo número de textos analisados
         for (int i = 0; i < request.Texts.Count; i++)
         {
-            await _apiKeyService.IncrementUsageAsync(apiKey.Id);
+            await _tokenService.IncrementUsageAsync(accessToken.Id);
         }
         
         return Ok(result);
@@ -146,16 +122,7 @@ public class ModerationController : ControllerBase
         { 
             status = "healthy", 
             timestamp = DateTime.UtcNow,
-            version = "1.0.0"
+            version = "2.0.0"
         });
     }
-    
-    private static int GetDailyLimit(PlanType plan) => plan switch
-    {
-        PlanType.Free => 100,
-        PlanType.Starter => 1000,
-        PlanType.Pro => 10000,
-        PlanType.Enterprise => int.MaxValue,
-        _ => 100
-    };
 }
