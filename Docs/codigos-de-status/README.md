@@ -11,8 +11,6 @@ Esta página documenta todos os códigos de status HTTP retornados pela AegisCor
 | Código | Nome | Descrição |
 |--------|------|-----------|
 | 200 | OK | Requisição processada com sucesso |
-| 201 | Created | Recurso criado com sucesso (ex: API key) |
-| 204 | No Content | Requisição bem-sucedida, sem conteúdo de retorno (ex: DELETE) |
 
 ---
 
@@ -21,11 +19,8 @@ Esta página documenta todos os códigos de status HTTP retornados pela AegisCor
 | Código | Nome | Descrição |
 |--------|------|-----------|
 | 400 | Bad Request | Dados inválidos na requisição |
-| 401 | Unauthorized | API key inválida, ausente ou JWT expirado |
-| 403 | Forbidden | Acesso negado ao recurso |
-| 404 | Not Found | Endpoint ou recurso não encontrado |
-| 422 | Unprocessable Entity | Dados válidos mas não processáveis |
-| 429 | Too Many Requests | Rate limit excedido |
+| 401 | Unauthorized | Token inválido, ausente ou expirado |
+| 429 | Too Many Requests | Limite de tokens por IP atingido |
 
 ---
 
@@ -34,7 +29,7 @@ Esta página documenta todos os códigos de status HTTP retornados pela AegisCor
 | Código | Nome | Descrição |
 |--------|------|-----------|
 | 500 | Internal Server Error | Erro interno do servidor |
-| 502 | Bad Gateway | Erro de comunicação com serviço externo (Perspective API) |
+| 502 | Bad Gateway | Erro de comunicação com Perspective API |
 | 503 | Service Unavailable | Serviço temporariamente indisponível |
 
 ---
@@ -45,41 +40,44 @@ Esta página documenta todos os códigos de status HTTP retornados pela AegisCor
 
 ```json
 {
-  "error": "Bad Request",
-  "message": "O campo 'text' é obrigatório",
-  "details": {
-    "field": "text",
-    "code": "REQUIRED_FIELD"
-  }
+  "error": "Text is required"
 }
 ```
 
-### 401 - Unauthorized
+### 401 - Token não fornecido
 
 ```json
 {
-  "error": "Unauthorized",
-  "message": "API key inválida ou não fornecida"
+  "error": "Token de acesso obrigatório",
+  "message": "Forneça seu token no header 'X-Access-Token'. Gere um em POST /api/token/generate"
 }
 ```
 
-### 429 - Rate Limit Excedido
+### 401 - Token inválido ou expirado
 
 ```json
 {
-  "error": "Too Many Requests",
-  "message": "Você atingiu o limite de requisições. Tente novamente em 1 hora.",
-  "retryAfter": 3600
+  "error": "Token inválido ou expirado",
+  "message": "O token fornecido é inválido ou expirou. Gere um novo em POST /api/token/generate"
 }
 ```
 
-### 500 - Internal Server Error
+### 429 - Limite de tokens atingido
+
+```json
+{
+  "error": "Limite de tokens atingido",
+  "message": "Você já possui 2 tokens ativos. Aguarde a expiração ou use um token existente.",
+  "limit": 2
+}
+```
+
+### 500 - Erro interno
 
 ```json
 {
   "error": "Internal Server Error",
-  "message": "Ocorreu um erro inesperado. Tente novamente.",
-  "requestId": "abc123-def456"
+  "message": "Ocorreu um erro inesperado. Tente novamente."
 }
 ```
 
@@ -90,39 +88,42 @@ Esta página documenta todos os códigos de status HTTP retornados pela AegisCor
 ### JavaScript
 
 ```javascript
-try {
-  const response = await fetch('/api/moderation/analyze', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Api-Key': 'sua_chave'
-    },
-    body: JSON.stringify({ text: 'Texto' })
-  });
+async function analyzeWithErrorHandling(token, text) {
+  try {
+    const response = await fetch('/api/moderation/analyze', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Access-Token': token
+      },
+      body: JSON.stringify({ text })
+    });
 
-  if (!response.ok) {
-    const error = await response.json();
-    
-    switch (response.status) {
-      case 400:
-        console.error('Dados inválidos:', error.message);
-        break;
-      case 401:
-        console.error('Autenticação falhou:', error.message);
-        break;
-      case 429:
-        console.error('Rate limit. Aguarde:', error.retryAfter, 'segundos');
-        break;
-      default:
-        console.error('Erro:', error.message);
+    if (!response.ok) {
+      const error = await response.json();
+      
+      switch (response.status) {
+        case 400:
+          console.error('Dados inválidos:', error.error);
+          break;
+        case 401:
+          console.error('Token expirado, gerando novo...');
+          // Gerar novo token
+          break;
+        case 429:
+          console.error('Limite atingido, aguarde expiração');
+          break;
+        default:
+          console.error('Erro:', error.message);
+      }
+      return null;
     }
-    return;
-  }
 
-  const data = await response.json();
-  console.log('Sucesso:', data);
-} catch (error) {
-  console.error('Erro de rede:', error);
+    return await response.json();
+  } catch (error) {
+    console.error('Erro de rede:', error);
+    return null;
+  }
 }
 ```
 
@@ -132,22 +133,26 @@ try {
 import requests
 from requests.exceptions import HTTPError
 
-try:
-    response = requests.post(
-        'https://api.aegiscore.com/api/moderation/analyze',
-        json={'text': 'Texto'},
-        headers={'X-Api-Key': 'sua_chave'}
-    )
-    response.raise_for_status()
-    data = response.json()
-    print('Sucesso:', data)
+def analyze_with_error_handling(token: str, text: str):
+    try:
+        response = requests.post(
+            'https://api.exemplo.com/api/moderation/analyze',
+            json={'text': text},
+            headers={'X-Access-Token': token}
+        )
+        response.raise_for_status()
+        return response.json()
 
-except HTTPError as e:
-    error = e.response.json()
-    
-    if e.response.status_code == 429:
-        retry_after = error.get('retryAfter', 60)
-        print(f'Rate limit. Aguarde {retry_after} segundos')
-    else:
-        print(f'Erro {e.response.status_code}: {error.get("message")}')
+    except HTTPError as e:
+        status = e.response.status_code
+        error = e.response.json()
+        
+        if status == 401:
+            print('Token expirado, gere um novo')
+        elif status == 429:
+            print('Limite de tokens atingido')
+        else:
+            print(f'Erro: {error}')
+        
+        return None
 ```

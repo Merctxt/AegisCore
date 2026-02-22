@@ -4,7 +4,7 @@
 
 ## Pré-requisitos
 
-- .NET 10 SDK
+- .NET 9 SDK
 - PostgreSQL 14+
 - Google Perspective API Key
 
@@ -17,18 +17,18 @@ cd AegisCore
 
 ## 2. Configure as variáveis de ambiente
 
-```bash
-cp .env.example .env
-```
-
-Edite o arquivo `.env`:
+Crie um arquivo `.env` ou configure as variáveis:
 
 ```env
 # Database (PostgreSQL)
 DATABASE_URL=postgresql://user:password@localhost:5432/aegiscore
 
-# JWT Authentication
-JWT_SECRET=sua-chave-secreta-com-pelo-menos-32-caracteres!
+# Ou variáveis separadas:
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=aegiscore
+DB_USERNAME=postgres
+DB_PASSWORD=sua_senha
 
 # Google Perspective API
 PERSPECTIVE_API_KEY=sua_chave_aqui
@@ -38,57 +38,57 @@ PERSPECTIVE_API_KEY=sua_chave_aqui
 
 ```bash
 cd AegisCoreApi
-dotnet ef migrations add InitialCreate
 dotnet ef database update
 ```
 
 ## 4. Inicie a API
 
 ```bash
-dotnet run --project AegisCoreApi
+dotnet run
 ```
 
-A API estará disponível em `https://localhost:5050`
+A API estará disponível em `http://localhost:5050`
 
 ---
 
-## Docker (Em breve)
+## Docker
 
-```dockerfile
-# Dockerfile disponível em breve
+```bash
 docker-compose up -d
 ```
+
+O `docker-compose.yml` já está configurado na raiz do projeto.
 
 ---
 
 ## Deploy em Produção
 
-### Variáveis de Ambiente para Produção
+### Variáveis de Ambiente
 
 ```env
 ASPNETCORE_ENVIRONMENT=Production
 DATABASE_URL=postgresql://user:password@host:5432/aegiscore_prod
-JWT_SECRET=chave-super-secreta-production
 PERSPECTIVE_API_KEY=sua_chave_production
 ```
 
-### Docker
+### Dockerfile
+
+O Dockerfile está na pasta `AegisCoreApi/`:
 
 ```dockerfile
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
 EXPOSE 80
 
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
-COPY ["AegisCoreApi/AegisCoreApi.csproj", "AegisCoreApi/"]
-RUN dotnet restore "AegisCoreApi/AegisCoreApi.csproj"
+COPY ["AegisCoreApi.csproj", "./"]
+RUN dotnet restore
 COPY . .
-WORKDIR "/src/AegisCoreApi"
-RUN dotnet build "AegisCoreApi.csproj" -c Release -o /app/build
+RUN dotnet build -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "AegisCoreApi.csproj" -c Release -o /app/publish
+RUN dotnet publish -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
@@ -98,52 +98,47 @@ ENTRYPOINT ["dotnet", "AegisCoreApi.dll"]
 
 ---
 
-## Segurança
+## Railway / Render / Fly.io
 
-### Boas Práticas
+A API está pronta para deploy em plataformas cloud:
 
-1. **Mude a API key padrão** no `.env`
-2. **Use HTTPS** em produção
-3. **Implemente logs de auditoria**
-4. **Configure firewall** para limitar acesso
-5. **Monitore uso da API** regularmente
+1. Configure `DATABASE_URL` e `PERSPECTIVE_API_KEY`
+2. A API detecta automaticamente a porta via variável `PORT`
+3. Migrations são aplicadas automaticamente no startup
 
-### Exemplo de Proxy Reverso (Nginx)
+---
+
+## Proxy Reverso (Nginx)
 
 ```nginx
 server {
     listen 80;
-    server_name sua-api.exemplo.com;
+    server_name api.exemplo.com;
     
     location / {
         proxy_pass http://localhost:5050;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        
-        # Rate limiting adicional
-        limit_req zone=api_limit burst=20 nodelay;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
 ```
 
 ---
 
-## Monitoramento
+## Health Check
 
-### Health Check
-
-Configure monitoramento automático:
+Configure monitoramento:
 
 ```bash
-# Verificar se a API está funcionando
-curl -f https://localhost:5050/health || exit 1
+curl -f http://localhost:5050/health || exit 1
 ```
 
-### Logs
-
-Os logs incluem:
-- Todas as requisições com request ID
-- Erros da Perspective API
-- Rate limiting ativado
-- Estatísticas de uso
+Resposta esperada:
+```json
+{
+  "status": "healthy",
+  "timestamp": "2026-02-21T22:00:00Z"
+}
+```

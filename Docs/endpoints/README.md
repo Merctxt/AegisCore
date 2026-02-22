@@ -6,6 +6,57 @@ Documentação completa de todos os endpoints disponíveis na AegisCore API.
 
 ---
 
+## Token
+
+### Gerar Token
+
+Cria um novo token de acesso para usar a API.
+
+```http
+POST /api/token/generate
+```
+
+**Resposta (200):**
+```json
+{
+  "token": "aegis_abc123xyz789...",
+  "expiresAt": "2026-02-21T23:30:00Z",
+  "expiresInMinutes": 30,
+  "usage": "Inclua o token no header 'X-Access-Token' para usar a API de moderação"
+}
+```
+
+**Erro (429) - Limite atingido:**
+```json
+{
+  "error": "Limite de tokens atingido",
+  "message": "Você já possui 2 tokens ativos. Aguarde a expiração ou use um token existente.",
+  "limit": 2
+}
+```
+
+---
+
+### Verificar Status do Token
+
+```http
+GET /api/token/status
+X-Access-Token: aegis_seu_token
+```
+
+**Resposta (200):**
+```json
+{
+  "isActive": true,
+  "expiresAt": "2026-02-21T23:30:00Z",
+  "remainingMinutes": 25.5,
+  "requestCount": 10,
+  "createdAt": "2026-02-21T23:00:00Z"
+}
+```
+
+---
+
 ## Health Check
 
 Verifica se a API está funcionando.
@@ -18,7 +69,7 @@ GET /health
 ```json
 {
   "status": "healthy",
-  "timestamp": "2026-01-15T10:30:00Z"
+  "timestamp": "2026-02-21T22:00:00Z"
 }
 ```
 
@@ -30,7 +81,7 @@ Analisa um texto em busca de conteúdo tóxico.
 
 ```http
 POST /api/moderation/analyze
-X-Api-Key: sua_chave
+X-Access-Token: aegis_seu_token
 Content-Type: application/json
 ```
 
@@ -39,7 +90,8 @@ Content-Type: application/json
 {
   "text": "Texto para analisar",
   "language": "pt",
-  "includeAllScores": false
+  "includeAllScores": false,
+  "toxicityThreshold": 0.7
 }
 ```
 
@@ -48,9 +100,10 @@ Content-Type: application/json
 {
   "isToxic": false,
   "toxicityScore": 0.12,
+  "thresholdUsed": 0.7,
   "allScores": null,
   "analyzedText": "Texto para analisar",
-  "timestamp": "2026-01-15T10:30:00Z"
+  "timestamp": "2026-02-21T22:00:00Z"
 }
 ```
 
@@ -59,8 +112,9 @@ Content-Type: application/json
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|-------------|-----------|
 | `text` | string | ✅ | Texto para analisar (máx. 3000 caracteres) |
-| `language` | string | ❌ | Idioma do texto (`pt`, `en`, `es`, etc.) |
-| `includeAllScores` | boolean | ❌ | Incluir todas as pontuações de análise |
+| `language` | string | ❌ | Idioma do texto (`pt`, `en`, `es`, etc.). Padrão: `pt` |
+| `includeAllScores` | boolean | ❌ | Incluir todas as pontuações. Padrão: `false` |
+| `toxicityThreshold` | number | ❌ | Threshold para considerar tóxico (0.0-1.0). Padrão: `0.7` |
 
 ### Resposta com `includeAllScores: true`
 
@@ -68,6 +122,7 @@ Content-Type: application/json
 {
   "isToxic": false,
   "toxicityScore": 0.12,
+  "thresholdUsed": 0.7,
   "allScores": {
     "toxicity": 0.12,
     "severeToxicity": 0.05,
@@ -77,7 +132,7 @@ Content-Type: application/json
     "threat": 0.02
   },
   "analyzedText": "Texto para analisar",
-  "timestamp": "2026-01-15T10:30:00Z"
+  "timestamp": "2026-02-21T22:00:00Z"
 }
 ```
 
@@ -89,7 +144,7 @@ Analisa múltiplos textos em uma única requisição.
 
 ```http
 POST /api/moderation/analyze/batch
-X-Api-Key: sua_chave
+X-Access-Token: aegis_seu_token
 Content-Type: application/json
 ```
 
@@ -97,7 +152,8 @@ Content-Type: application/json
 ```json
 {
   "texts": ["texto1", "texto2", "texto3"],
-  "language": "pt"
+  "language": "pt",
+  "toxicityThreshold": 0.7
 }
 ```
 
@@ -106,79 +162,27 @@ Content-Type: application/json
 {
   "results": [
     {
-      "index": 0,
       "text": "texto1",
       "isToxic": false,
       "toxicityScore": 0.10
     },
     {
-      "index": 1,
       "text": "texto2",
       "isToxic": false,
       "toxicityScore": 0.08
     },
     {
-      "index": 2,
       "text": "texto3",
       "isToxic": true,
       "toxicityScore": 0.85
     }
   ],
-  "summary": {
-    "total": 3,
-    "toxic": 1,
-    "safe": 2
-  },
-  "timestamp": "2026-01-15T10:30:00Z"
+  "totalAnalyzed": 3,
+  "toxicCount": 1,
+  "timestamp": "2026-02-21T22:00:00Z"
 }
 ```
 
----
+### Limites
 
-## Gerenciamento de API Keys
-
-### Listar API Keys
-
-```http
-GET /api/apikeys
-Authorization: Bearer seu_jwt_token
-```
-
-### Criar API Key
-
-```http
-POST /api/apikeys
-Authorization: Bearer seu_jwt_token
-Content-Type: application/json
-
-{
-  "name": "Minha Aplicação"
-}
-```
-
-### Revogar API Key
-
-```http
-DELETE /api/apikeys/{id}
-Authorization: Bearer seu_jwt_token
-```
-
----
-
-## Thresholds Personalizados
-
-Configure thresholds para cada tipo de análise:
-
-```json
-{
-  "text": "Texto para analisar",
-  "thresholds": {
-    "toxicity": 0.8,        // Toxicidade geral
-    "severeToxicity": 0.9,  // Toxicidade severa
-    "identityAttack": 0.7,  // Ataques de identidade
-    "insult": 0.6,          // Insultos
-    "profanity": 0.5,       // Palavrões
-    "threat": 0.8           // Ameaças
-  }
-}
-```
+- Máximo de **100 textos** por requisição

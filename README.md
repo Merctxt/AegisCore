@@ -22,9 +22,9 @@ Comprehensive documentation is available in the `Docs/` directory:
 - [Authentication](Docs/autenticacao/README.md)
 - [Rate Limiting](Docs/rate-limiting/README.md)
 - [Endpoints](Docs/endpoints/README.md)
-- [Usage Examples](Docs/exemplos-de-uso/README.md)
-- [Status Codes](Docs/codigos-de-status/README.md)
-- [Application Integration](Docs/integracao-com-aplicacoes/README.md)
+- [examples of use](Docs/exemplos-de-uso/README.md)
+- [status codes](Docs/codigos-de-status/README.md)
+- [Integration with Applications](Docs/integracao-com-aplicacoes/README.md)
 
 
 

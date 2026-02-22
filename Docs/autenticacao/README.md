@@ -2,68 +2,43 @@
 
 # Autenticação
 
-A AegisCore API suporta dois métodos de autenticação: **JWT Token** e **API Key**.
+A AegisCore API usa um sistema de **Token de Acesso** simples e seguro.
 
 ---
 
-## JWT Token (para Administração)
+## Como Funciona
 
-Use JWT para acessar endpoints administrativos e gerenciar sua conta.
+1. **Gere um token** via `POST /api/token/generate`
+2. **Use o token** no header `X-Access-Token` das requisições
+3. **Token expira** após 30 minutos (gere outro quando necessário)
 
-### Login
+---
+
+## Gerar Token
 
 ```http
-POST /api/auth/login
-Content-Type: application/json
-
-{
-  "email": "usuario@email.com",
-  "password": "suasenha"
-}
+POST /api/token/generate
 ```
 
-### Resposta
-
+**Resposta:**
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "expiresAt": "2026-01-22T12:00:00Z",
-  "user": {
-    "id": "guid",
-    "name": "Nome",
-    "email": "email@email.com",
-    "plan": "Free"
-  }
+  "token": "aegis_abc123xyz789...",
+  "expiresAt": "2026-02-21T23:30:00Z",
+  "expiresInMinutes": 30,
+  "usage": "Inclua o token no header 'X-Access-Token' para usar a API de moderação"
 }
-```
-
-### Uso do Token
-
-Inclua o token no header `Authorization`:
-
-```http
-GET /api/user/profile
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 ---
 
-## API Key (para Moderation Endpoints)
+## Usar o Token
 
-Use API Keys para acessar os endpoints de moderação de conteúdo.
-
-### Obter API Key
-
-1. Faça login via `/api/auth/login`
-2. Use o endpoint `POST /api/apikeys` para criar uma nova chave
-
-### Uso da API Key
-
-Inclua a chave no header `X-Api-Key`:
+Inclua o token no header `X-Access-Token`:
 
 ```http
 POST /api/moderation/analyze
-X-Api-Key: aegis_sua_chave_aqui
+X-Access-Token: aegis_abc123xyz789...
 Content-Type: application/json
 
 {
@@ -73,9 +48,48 @@ Content-Type: application/json
 
 ---
 
-## Boas Práticas de Segurança
+## Verificar Status do Token
 
-1. **Nunca exponha** sua API Key no frontend
-2. **Rotacione** suas API Keys periodicamente
-3. **Use variáveis de ambiente** para armazenar secrets
+```http
+GET /api/token/status
+X-Access-Token: aegis_abc123xyz789...
+```
+
+**Resposta:**
+```json
+{
+  "isActive": true,
+  "expiresAt": "2026-02-21T23:30:00Z",
+  "remainingMinutes": 25.5,
+  "requestCount": 10,
+  "createdAt": "2026-02-21T23:00:00Z"
+}
+```
+
+---
+
+## Limites
+
+| Limite | Valor |
+|--------|-------|
+| Tokens ativos por IP | 2 |
+| Duração do token | 30 minutos |
+
+Quando você já tiver 2 tokens ativos, receberá erro `429`:
+
+```json
+{
+  "error": "Limite de tokens atingido",
+  "message": "Você já possui 2 tokens ativos. Aguarde a expiração ou use um token existente.",
+  "limit": 2
+}
+```
+
+---
+
+## Boas Práticas
+
+1. **Guarde seu token** após gerá-lo
+2. **Reutilize o token** enquanto estiver válido
+3. **Verifique o status** antes de gerar um novo
 4. **Use HTTPS** sempre em produção
