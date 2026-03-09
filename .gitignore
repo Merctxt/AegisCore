@@ -74,3 +74,4 @@ Thumbs.db
 docker-compose.yml
 
 *Migrations*/
+aegiscore.db

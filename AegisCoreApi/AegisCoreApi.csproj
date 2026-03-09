@@ -10,18 +10,12 @@
     <!-- OpenAPI / Swagger -->
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
     
-    <!-- Entity Framework Core + PostgreSQL -->
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+    <!-- Entity Framework Core + SQLite -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.6" />
     
-    <!-- Authentication JWT -->
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.6" />
-    
-    <!-- Rate Limiting -->
-    <PackageReference Include="AspNetCoreRateLimit" Version="5.0.0" />
-    
-    <!-- Password Hashing -->
-    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <!-- PostgreSQL (comentado - para usar no Railway se necessário) -->
+    <!-- <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" /> -->
   </ItemGroup>
 
 </Project>

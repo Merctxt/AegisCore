@@ -41,11 +41,17 @@ public class Program
         var configuration = builder.Configuration;
         
         
-        // Database - PostgreSQL
-        var connectionString = BuildConnectionString(configuration);
+        // Database - SQLite (economia de custo)
+        var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "aegiscore.db");
+        services.AddDbContext<AegisDbContext>(options =>
+            options.UseSqlite($"Data Source={dbPath}"));
+        Console.WriteLine($"[DB] Using SQLite at: {dbPath}");
         
+        /* PostgreSQL (para usar no Railway se necessário)
+        var connectionString = BuildConnectionString(configuration);
         services.AddDbContext<AegisDbContext>(options =>
             options.UseNpgsql(connectionString));
+        */
         
         // Controllers
         services.AddControllers();
