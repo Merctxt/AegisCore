@@ -1,7 +1,7 @@
 # AegisCore - AI Content Moderation API
 
 ![.NET](https://img.shields.io/badge/.NET-9-blue)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14+-blue)
+![SQLite](https://img.shields.io/badge/SQLite-9+-blue)
 ![License](https://img.shields.io/badge/License-CC0%201.0-lightgrey)
 ![Status](https://img.shields.io/badge/Status-Production--Ready-brightgreen)
 
