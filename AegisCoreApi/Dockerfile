@@ -3,7 +3,6 @@ FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
 EXPOSE 80
 
-# Define locale para UTF-8
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 ENV ASPNETCORE_ENVIRONMENT=Production
@@ -11,13 +10,12 @@ ENV ASPNETCORE_ENVIRONMENT=Production
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-# Copia o projeto da API
-COPY ["AegisCoreApi/AegisCoreApi.csproj", "AegisCoreApi/"]
-RUN dotnet restore "AegisCoreApi/AegisCoreApi.csproj"
+# Copia o csproj
+COPY ["AegisCoreApi.csproj", "./"]
+RUN dotnet restore "AegisCoreApi.csproj"
 
-# Copia o resto dos arquivos
-COPY AegisCoreApi/ AegisCoreApi/
-WORKDIR "/src/AegisCoreApi"
+# Copia o resto
+COPY . .
 RUN dotnet build "AegisCoreApi.csproj" -c Release -o /app/build
 
 FROM build AS publish
