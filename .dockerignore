@@ -12,6 +12,5 @@
 **/appsettings.Development.json
 **/appsettings.Production.json
 **/*.md
-**/Dockerfile*
 **/docker-compose*
 **/.dockerignore
